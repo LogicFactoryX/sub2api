@@ -94,19 +94,20 @@ try {
     Write-Host "Installing and checking frontend dependencies..."
     Push-Location (Join-Path $repoRoot "frontend")
     try {
-        Invoke-Native $corepack pnpm@9 install --frozen-lockfile
-        Invoke-Native $corepack pnpm@9 run typecheck
-        Invoke-Native $corepack pnpm@9 run build
+        $oldCi = $env:CI
+        try {
+            $env:CI = "true"
+            Invoke-Native $corepack pnpm@9 install --frozen-lockfile
+            Invoke-Native $corepack pnpm@9 run typecheck
+            Invoke-Native $corepack pnpm@9 run build
+        }
+        finally {
+            $env:CI = $oldCi
+        }
     }
     finally {
         Pop-Location
     }
-
-    $embeddedDist = Join-Path $repoRoot "backend\internal\web\dist"
-    if (Test-Path -LiteralPath $embeddedDist) {
-        Remove-Item -LiteralPath $embeddedDist -Recurse -Force
-    }
-    Copy-Item -LiteralPath (Join-Path $repoRoot "frontend\dist") -Destination $embeddedDist -Recurse
 
     Write-Host "Running backend tests..."
     Push-Location (Join-Path $repoRoot "backend")
