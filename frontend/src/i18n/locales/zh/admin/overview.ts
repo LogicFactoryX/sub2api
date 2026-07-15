@@ -809,6 +809,8 @@ export default {
         no: '否'
       },
       exclusive: '专属',
+      showToAllUsers: '向所有用户展示',
+      showToAllUsersHint: '未解锁用户可以看到该分组和优惠倍率，但不能选择使用。',
       exclusiveHint: '专属分组，可以手动指定给特定用户',
       exclusiveTooltip: {
         title: '什么是专属分组？',

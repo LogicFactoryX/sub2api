@@ -753,6 +753,8 @@ export default {
       allGroups: 'All Groups',
       exclusiveFilter: 'Exclusive',
       exclusive: 'Exclusive',
+      showToAllUsers: 'Show to all users',
+      showToAllUsersHint: 'Locked users can preview this group and its rate, but cannot select it.',
       nonExclusive: 'Non-Exclusive',
       public: 'Public',
       columns: {

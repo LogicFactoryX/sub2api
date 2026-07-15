@@ -11,6 +11,7 @@
         :platform="platform"
         :subscription-type="subscriptionType"
         :show-rate="false"
+        :access-expires-at="accessExpiresAt"
         class="groupOptionItemBadge"
       />
       <!-- Row 2: description with top spacing -->
@@ -25,6 +26,12 @@
     <!-- Right: rate pill + checkmark (vertically centered to first row) -->
     <div class="flex shrink-0 items-center gap-2 pt-0.5">
       <div class="flex shrink-0 flex-col items-end gap-1">
+        <span
+          v-if="locked"
+          class="inline-flex items-center whitespace-nowrap rounded bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 dark:bg-dark-600 dark:text-gray-200"
+        >
+          {{ t('keys.groupLocked') }}
+        </span>
         <!-- Rate pill (platform color) -->
         <span v-if="rateMultiplier !== undefined" :class="['inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold', ratePillClass]">
           <template v-if="hasCustomRate">
@@ -81,6 +88,8 @@ interface Props {
   description?: string | null
   selected?: boolean
   showCheckmark?: boolean
+  accessExpiresAt?: string | null
+  locked?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {

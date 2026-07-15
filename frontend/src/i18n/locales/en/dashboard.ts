@@ -66,6 +66,8 @@ export default {
 
   // API Keys
   keys: {
+    groupLocked: 'Locked',
+    groupAccessExpiresAt: 'Available until {time}',
     title: 'API Keys',
     description: 'Manage your API keys and access tokens',
     searchPlaceholder: 'Search name or key...',
@@ -588,6 +590,7 @@ export default {
     concurrencyReducedAdmin: 'Concurrency Reduced (Admin)',
     adminAdjustment: 'Admin Adjustment',
     subscriptionAssigned: 'Subscription Assigned',
+    groupAccessGranted: 'Group access granted',
     subscriptionAssignedDesc: 'You have been granted access to {groupName}',
     subscriptionDays: '{days} days',
     days: ' days',

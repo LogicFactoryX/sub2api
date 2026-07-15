@@ -14,7 +14,9 @@ import type { Group } from '@/types'
  * @returns List of available groups
  */
 export async function getAvailable(): Promise<Group[]> {
-  const { data } = await apiClient.get<Group[]>('/groups/available')
+  const { data } = await apiClient.get<Group[]>('/groups/available', {
+    params: { include_locked: true }
+  })
   return data
 }
 

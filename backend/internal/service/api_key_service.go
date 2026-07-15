@@ -207,6 +207,7 @@ type APIKeyService struct {
 	groupRepo             GroupRepository
 	userSubRepo           UserSubscriptionRepository
 	userGroupRateRepo     UserGroupRateRepository
+	groupEntitlementRepo  GroupEntitlementRepository
 	cache                 APIKeyCache
 	rateLimitCacheInvalid RateLimitCacheInvalidator // optional: invalidate Redis rate limit cache
 	concurrencyService    *ConcurrencyService
@@ -249,6 +250,10 @@ func (s *APIKeyService) SetRateLimitCacheInvalidator(inv RateLimitCacheInvalidat
 
 func (s *APIKeyService) SetConcurrencyService(concurrencyService *ConcurrencyService) {
 	s.concurrencyService = concurrencyService
+}
+
+func (s *APIKeyService) SetGroupEntitlementRepository(repo GroupEntitlementRepository) {
+	s.groupEntitlementRepo = repo
 }
 
 func (s *APIKeyService) compileAPIKeyIPRules(apiKey *APIKey) {
@@ -334,6 +339,12 @@ func (s *APIKeyService) canUserBindGroup(ctx context.Context, user *User, group 
 	if group.IsSubscriptionType() {
 		_, err := s.userSubRepo.GetActiveByUserIDAndGroupID(ctx, user.ID, group.ID)
 		return err == nil // 有有效订阅则允许
+	}
+	if s.groupEntitlementRepo != nil {
+		active, err := s.groupEntitlementRepo.HasActive(ctx, user.ID, group.ID, time.Now().UTC())
+		if err == nil && active {
+			return true
+		}
 	}
 	// 标准类型分组：使用原有逻辑
 	return user.CanBindGroup(group.ID, group.IsExclusive)
@@ -885,16 +896,58 @@ func (s *APIKeyService) GetAvailableGroups(ctx context.Context, userID int64) ([
 	for _, sub := range activeSubscriptions {
 		subscribedGroupIDs[sub.GroupID] = true
 	}
+	temporaryGroupExpiries := make(map[int64]time.Time)
+	if s.groupEntitlementRepo != nil {
+		expiries, err := s.groupEntitlementRepo.ListActiveGroupExpiries(ctx, userID, time.Now().UTC())
+		if err != nil {
+			return nil, fmt.Errorf("list active group entitlements: %w", err)
+		}
+		temporaryGroupExpiries = expiries
+	}
 
 	// 过滤出用户有权限的分组
 	availableGroups := make([]Group, 0)
 	for _, group := range allGroups {
 		if s.canUserBindGroupInternal(user, &group, subscribedGroupIDs) {
 			availableGroups = append(availableGroups, group)
+		} else if expiresAt, ok := temporaryGroupExpiries[group.ID]; ok {
+			expiresAtCopy := expiresAt
+			group.AccessExpiresAt = &expiresAtCopy
+			availableGroups = append(availableGroups, group)
 		}
 	}
 
 	return availableGroups, nil
+}
+
+// GetAPIKeySelectorGroups returns bindable groups plus explicitly advertised
+// exclusive groups. Advertised locked groups are display-only; Create/Update
+// still enforce canUserBindGroup.
+func (s *APIKeyService) GetAPIKeySelectorGroups(ctx context.Context, userID int64) ([]Group, error) {
+	available, err := s.GetAvailableGroups(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	seen := make(map[int64]struct{}, len(available))
+	for i := range available {
+		seen[available[i].ID] = struct{}{}
+	}
+	allGroups, err := s.groupRepo.ListActive(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list active groups: %w", err)
+	}
+	for i := range allGroups {
+		group := allGroups[i]
+		if _, ok := seen[group.ID]; ok {
+			continue
+		}
+		if !group.ShowToAllUsers || !group.IsExclusive || group.IsSubscriptionType() {
+			continue
+		}
+		group.IsLocked = true
+		available = append(available, group)
+	}
+	return available, nil
 }
 
 // canUserBindGroupInternal 内部方法，检查用户是否可以绑定分组（使用预加载的订阅数据）

@@ -652,6 +652,15 @@
               }}
             </span>
           </div>
+          <div v-if="createForm.is_exclusive" class="mt-4 flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600">
+            <div class="min-w-0 pr-4">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('admin.groups.showToAllUsers') }}</p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.groups.showToAllUsersHint') }}</p>
+            </div>
+            <button type="button" role="switch" :aria-checked="createForm.show_to_all_users" @click="createForm.show_to_all_users = !createForm.show_to_all_users" :class="['relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors', createForm.show_to_all_users ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600']">
+              <span :class="['inline-block h-4 w-4 rounded-full bg-white transition-transform', createForm.show_to_all_users ? 'translate-x-6' : 'translate-x-1']" />
+            </button>
+          </div>
         </div>
 
         <!-- Subscription Configuration -->
@@ -2160,6 +2169,15 @@
                   : t("admin.groups.public")
               }}
             </span>
+          </div>
+          <div v-if="editForm.is_exclusive" class="mt-4 flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600">
+            <div class="min-w-0 pr-4">
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('admin.groups.showToAllUsers') }}</p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.groups.showToAllUsersHint') }}</p>
+            </div>
+            <button type="button" role="switch" :aria-checked="editForm.show_to_all_users" @click="editForm.show_to_all_users = !editForm.show_to_all_users" :class="['relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors', editForm.show_to_all_users ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600']">
+              <span :class="['inline-block h-4 w-4 rounded-full bg-white transition-transform', editForm.show_to_all_users ? 'translate-x-6' : 'translate-x-1']" />
+            </button>
           </div>
         </div>
         <div>
@@ -3992,6 +4010,7 @@ const createForm = reactive({
   platform: "anthropic" as GroupPlatform,
   rate_multiplier: 1.0,
   is_exclusive: false,
+  show_to_all_users: false,
   subscription_type: "standard" as SubscriptionType,
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
@@ -4338,6 +4357,7 @@ const editForm = reactive({
   platform: "anthropic" as GroupPlatform,
   rate_multiplier: 1.0,
   is_exclusive: false,
+  show_to_all_users: false,
   status: "active" as "active" | "inactive",
   subscription_type: "standard" as SubscriptionType,
   daily_limit_usd: null as number | null,
@@ -4746,6 +4766,7 @@ const closeCreateModal = () => {
   createForm.platform = "anthropic";
   createForm.rate_multiplier = 1.0;
   createForm.is_exclusive = false;
+  createForm.show_to_all_users = false;
   createForm.subscription_type = "standard";
   createForm.daily_limit_usd = null;
   createForm.weekly_limit_usd = null;
@@ -4911,6 +4932,7 @@ const handleEdit = async (group: AdminGroup) => {
   editForm.platform = group.platform;
   editForm.rate_multiplier = group.rate_multiplier;
   editForm.is_exclusive = group.is_exclusive;
+  editForm.show_to_all_users = group.show_to_all_users ?? false;
   editForm.status = group.status;
   editForm.subscription_type = group.subscription_type || "standard";
   editForm.daily_limit_usd = group.daily_limit_usd;

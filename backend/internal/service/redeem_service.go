@@ -142,6 +142,7 @@ type RedeemService struct {
 	entClient            *dbent.Client
 	authCacheInvalidator APIKeyAuthCacheInvalidator
 	affiliateService     *AffiliateService
+	groupEntitlementRepo GroupEntitlementRepository
 }
 
 // NewRedeemService 创建兑换码服务实例
@@ -167,6 +168,10 @@ func NewRedeemService(
 		authCacheInvalidator: authCacheInvalidator,
 		affiliateService:     affiliateService,
 	}
+}
+
+func (s *RedeemService) SetGroupEntitlementRepository(repo GroupEntitlementRepository) {
+	s.groupEntitlementRepo = repo
 }
 
 // GenerateRandomCode 生成随机兑换码
@@ -254,7 +259,7 @@ func (s *RedeemService) CreateCode(ctx context.Context, code *RedeemCode) error 
 	if code.Type == "" {
 		code.Type = RedeemTypeBalance
 	}
-	if code.Type != RedeemTypeInvitation && code.Value == 0 {
+	if code.Type != RedeemTypeInvitation && code.Type != RedeemTypeGroup && code.Value == 0 {
 		return errors.New("value must not be zero")
 	}
 	if code.Status == "" {
@@ -424,6 +429,10 @@ func (s *RedeemService) Redeem(ctx context.Context, userID int64, code string) (
 		if redeemCode.GroupID == nil {
 			return nil, infraerrors.BadRequest("REDEEM_CODE_INVALID", "invalid subscription redeem code: missing group_id")
 		}
+	case RedeemTypeGroup:
+		if redeemCode.GroupID == nil || redeemCode.FallbackGroupID == nil || redeemCode.ValidityDays <= 0 {
+			return nil, infraerrors.BadRequest("REDEEM_CODE_INVALID", "invalid group redeem code configuration")
+		}
 	default:
 		return nil, unsupportedRedeemTypeError(redeemCode.Type)
 	}
@@ -504,6 +513,24 @@ func (s *RedeemService) Redeem(ctx context.Context, userID int64, code string) (
 			}
 		}
 
+	case RedeemTypeGroup:
+		if s.groupEntitlementRepo == nil {
+			return nil, errors.New("group entitlement repository is not configured")
+		}
+		startsAt := time.Now().UTC()
+		expiresAt := startsAt.AddDate(0, 0, redeemCode.ValidityDays)
+		if err := s.groupEntitlementRepo.Grant(
+			txCtx,
+			userID,
+			redeemCode.ID,
+			*redeemCode.GroupID,
+			*redeemCode.FallbackGroupID,
+			startsAt,
+			expiresAt,
+		); err != nil {
+			return nil, fmt.Errorf("grant group entitlement: %w", err)
+		}
+
 	default:
 		return nil, unsupportedRedeemTypeError(redeemCode.Type)
 	}
@@ -566,6 +593,10 @@ func (s *RedeemService) invalidateRedeemCaches(ctx context.Context, userID int64
 				defer cancel()
 				_ = s.billingCacheService.InvalidateSubscription(cacheCtx, userID, groupID)
 			}()
+		}
+	case RedeemTypeGroup:
+		if s.authCacheInvalidator != nil {
+			s.authCacheInvalidator.InvalidateAuthCacheByUserID(ctx, userID)
 		}
 	}
 }

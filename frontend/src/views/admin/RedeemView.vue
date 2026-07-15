@@ -277,7 +277,7 @@
       <div v-if="showGenerateDialog" class="fixed inset-0 z-50 flex items-center justify-center">
         <div class="fixed inset-0 bg-black/50" @click="showGenerateDialog = false"></div>
         <div
-          class="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl dark:bg-dark-800"
+          class="relative z-10 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg bg-white p-6 shadow-xl dark:bg-dark-800"
         >
           <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
             {{ t('admin.redeem.generateCodesTitle') }}
@@ -288,7 +288,7 @@
               <Select v-model="generateForm.type" :options="typeOptions" />
             </div>
             <!-- 余额/并发类型：显示数值输入 -->
-            <div v-if="generateForm.type !== 'subscription' && generateForm.type !== 'invitation'">
+            <div v-if="!['subscription', 'group', 'invitation'].includes(generateForm.type)">
               <label class="input-label">
                 {{
                   generateForm.type === 'balance'
@@ -354,6 +354,50 @@
                   required
                   class="input"
                 />
+              </div>
+            </template>
+            <template v-if="generateForm.type === 'group'">
+              <div>
+                <label class="input-label">{{ t('admin.redeem.groupCardTarget') }}</label>
+                <Select
+                  v-model="generateForm.group_id"
+                  :options="standardGroupOptions"
+                  :placeholder="t('admin.redeem.groupCardTargetPlaceholder')"
+                >
+                  <template #selected="{ option }">
+                    <GroupBadge
+                      v-if="option"
+                      :name="(option as unknown as GroupOption).label"
+                      :platform="(option as unknown as GroupOption).platform"
+                      :subscription-type="(option as unknown as GroupOption).subscriptionType"
+                      :rate-multiplier="(option as unknown as GroupOption).rate"
+                    />
+                    <span v-else class="text-gray-400">{{ t('admin.redeem.groupCardTargetPlaceholder') }}</span>
+                  </template>
+                  <template #option="{ option, selected }">
+                    <GroupOptionItem
+                      :name="(option as unknown as GroupOption).label"
+                      :platform="(option as unknown as GroupOption).platform"
+                      :subscription-type="(option as unknown as GroupOption).subscriptionType"
+                      :rate-multiplier="(option as unknown as GroupOption).rate"
+                      :description="(option as unknown as GroupOption).description"
+                      :selected="selected"
+                    />
+                  </template>
+                </Select>
+              </div>
+              <div>
+                <label class="input-label">{{ t('admin.redeem.validityDays') }}</label>
+                <input v-model.number="generateForm.validity_days" type="number" min="1" max="3650" required class="input" />
+              </div>
+              <div>
+                <label class="input-label">{{ t('admin.redeem.fallbackGroup') }}</label>
+                <Select
+                  v-model="generateForm.fallback_group_id"
+                  :options="fallbackGroupOptions"
+                  :placeholder="t('admin.redeem.fallbackGroupPlaceholder')"
+                />
+                <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">{{ t('admin.redeem.fallbackGroupHint') }}</p>
               </div>
             </template>
             <div>
@@ -667,6 +711,28 @@ const subscriptionGroupOptions = computed(() => {
     }))
 })
 
+const standardGroupOptions = computed(() => {
+  return subscriptionGroups.value
+    .filter((g) => g.subscription_type !== 'subscription' && g.status === 'active')
+    .map((g) => ({
+      value: g.id,
+      label: g.name,
+      description: g.description,
+      platform: g.platform,
+      subscriptionType: g.subscription_type,
+      rate: g.rate_multiplier,
+      exclusive: g.is_exclusive
+    }))
+})
+
+const fallbackGroupOptions = computed(() => {
+  const target = subscriptionGroups.value.find((g) => g.id === Number(generateForm.group_id))
+  if (!target) return []
+  return standardGroupOptions.value.filter(
+    (g) => g.platform === target.platform && !g.exclusive && g.value !== target.id
+  )
+})
+
 const batchGroupOptions = computed(() => [
   { value: null, label: t('admin.redeem.clearGroup') },
   ...subscriptionGroupOptions.value
@@ -735,6 +801,7 @@ const typeOptions = computed(() => [
   { value: 'balance', label: t('admin.redeem.balance') },
   { value: 'concurrency', label: t('admin.redeem.concurrency') },
   { value: 'subscription', label: t('admin.redeem.subscription') },
+  { value: 'group', label: t('admin.redeem.groupCard') },
   { value: 'invitation', label: t('admin.redeem.invitation') }
 ])
 
@@ -743,6 +810,7 @@ const filterTypeOptions = computed(() => [
   { value: 'balance', label: t('admin.redeem.balance') },
   { value: 'concurrency', label: t('admin.redeem.concurrency') },
   { value: 'subscription', label: t('admin.redeem.subscription') },
+  { value: 'group', label: t('admin.redeem.groupCard') },
   { value: 'invitation', label: t('admin.redeem.invitation') }
 ])
 
@@ -832,6 +900,7 @@ const generateForm = reactive({
   value: 10,
   count: 1,
   group_id: null as number | null,
+  fallback_group_id: null as number | null,
   validity_days: 30,
   expiry_option: 'never' as RedeemCodeExpiryOption,
   custom_expiry_days: 7
@@ -841,7 +910,9 @@ const generateForm = reactive({
 watch(
   () => generateForm.type,
   (newType) => {
-    if (newType === 'invitation') {
+    generateForm.group_id = null
+    generateForm.fallback_group_id = null
+    if (newType === 'invitation' || newType === 'group') {
       generateForm.value = 0
     } else if (generateForm.value === 0) {
       generateForm.value = 10
@@ -1019,8 +1090,12 @@ const buildBatchUpdateFields = (): BatchUpdateRedeemCodeFields | null => {
 
 const handleGenerateCodes = async () => {
   // 订阅类型必须选择分组
-  if (generateForm.type === 'subscription' && !generateForm.group_id) {
+  if ((generateForm.type === 'subscription' || generateForm.type === 'group') && !generateForm.group_id) {
     appStore.showError(t('admin.redeem.groupRequired'))
+    return
+  }
+  if (generateForm.type === 'group' && !generateForm.fallback_group_id) {
+    appStore.showError(t('admin.redeem.fallbackGroupRequired'))
     return
   }
 
@@ -1036,15 +1111,17 @@ const handleGenerateCodes = async () => {
       generateForm.count,
       generateForm.type,
       generateForm.value,
-      generateForm.type === 'subscription' ? generateForm.group_id : undefined,
-      generateForm.type === 'subscription' ? generateForm.validity_days : undefined,
-      expiresInDays
+      generateForm.type === 'subscription' || generateForm.type === 'group' ? generateForm.group_id : undefined,
+      generateForm.type === 'subscription' || generateForm.type === 'group' ? generateForm.validity_days : undefined,
+      expiresInDays,
+      generateForm.type === 'group' ? generateForm.fallback_group_id : undefined
     )
     showGenerateDialog.value = false
     generatedCodes.value = result
     showResultDialog.value = true
     // 重置表单
     generateForm.group_id = null
+    generateForm.fallback_group_id = null
     generateForm.validity_days = 30
     generateForm.expiry_option = 'never'
     generateForm.custom_expiry_days = 7

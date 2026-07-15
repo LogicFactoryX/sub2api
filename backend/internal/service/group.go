@@ -26,6 +26,7 @@ type Group struct {
 	PeakEnd            string
 	PeakRateMultiplier float64
 	IsExclusive        bool
+	ShowToAllUsers     bool
 	Status             string
 	Hydrated           bool // indicates the group was loaded from a trusted repository source
 
@@ -90,6 +91,9 @@ type Group struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	// AccessExpiresAt is set only for user-scoped temporary group-card access.
+	AccessExpiresAt *time.Time
+	IsLocked        bool
 
 	AccountGroups           []AccountGroup
 	AccountCount            int64

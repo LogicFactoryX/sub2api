@@ -152,6 +152,7 @@
                   :peak-start="row.group.peak_start"
                   :peak-end="row.group.peak_end"
                   :peak-rate-multiplier="row.group.peak_rate_multiplier"
+                  :access-expires-at="groupAccessExpiry(row.group.id)"
                 />
                 <span v-else class="text-sm text-gray-400 dark:text-dark-500">{{
                   t('keys.noGroup')
@@ -486,6 +487,8 @@
                 :peak-start="(option as unknown as GroupOption).peakStart"
                 :peak-end="(option as unknown as GroupOption).peakEnd"
                 :peak-rate-multiplier="(option as unknown as GroupOption).peakRateMultiplier"
+                :access-expires-at="(option as unknown as GroupOption).accessExpiresAt"
+                :locked="(option as unknown as GroupOption).locked"
               />
               <span v-else class="text-gray-400">{{ t('keys.selectGroup') }}</span>
             </template>
@@ -502,6 +505,8 @@
                 :peak-rate-multiplier="(option as unknown as GroupOption).peakRateMultiplier"
                 :description="(option as unknown as GroupOption).description"
                 :selected="selected"
+                :access-expires-at="(option as unknown as GroupOption).accessExpiresAt"
+                :locked="(option as unknown as GroupOption).locked"
               />
             </template>
           </Select>
@@ -1078,14 +1083,17 @@
           <button
             v-for="option in filteredGroupOptions"
             :key="option.value ?? 'null'"
-            @click="changeGroup(selectedKeyForGroup!, option.value)"
+            @click="!option.locked && changeGroup(selectedKeyForGroup!, option.value)"
+            :disabled="option.locked"
             :class="[
               'flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors',
               'border-b border-gray-100 last:border-0 dark:border-dark-700',
               selectedKeyForGroup?.group_id === option.value ||
               (!selectedKeyForGroup?.group_id && option.value === null)
                 ? 'bg-primary-50 dark:bg-primary-900/20'
-                : 'hover:bg-gray-100 dark:hover:bg-dark-700'
+                : option.locked
+                  ? 'cursor-not-allowed opacity-60'
+                  : 'hover:bg-gray-100 dark:hover:bg-dark-700'
             ]"
             :title="option.description || undefined"
           >
@@ -1104,6 +1112,8 @@
                 selectedKeyForGroup?.group_id === option.value ||
                 (!selectedKeyForGroup?.group_id && option.value === null)
               "
+              :access-expires-at="option.accessExpiresAt"
+              :locked="option.locked"
             />
           </button>
           <!-- Empty state when search has no results -->
@@ -1169,6 +1179,8 @@ interface GroupOption {
   peakRateMultiplier: number
   subscriptionType: SubscriptionType
   platform: GroupPlatform
+  accessExpiresAt: string | null
+  locked: boolean
 }
 
 const appStore = useAppStore()
@@ -1420,9 +1432,16 @@ const groupOptions = computed(() =>
     peakEnd: group.peak_end,
     peakRateMultiplier: group.peak_rate_multiplier,
     subscriptionType: group.subscription_type,
-    platform: group.platform
+    platform: group.platform,
+    accessExpiresAt: group.access_expires_at ?? null,
+    locked: group.is_locked ?? false,
+    disabled: group.is_locked ?? false
   }))
 )
+
+const groupAccessExpiry = (groupId: number): string | null => {
+  return groups.value.find((group) => group.id === groupId)?.access_expires_at ?? null
+}
 
 // Group dropdown search
 const groupSearchQuery = ref('')

@@ -34,6 +34,8 @@ const (
 	FieldExpiresAt = "expires_at"
 	// FieldGroupID holds the string denoting the group_id field in the database.
 	FieldGroupID = "group_id"
+	// FieldFallbackGroupID holds the string denoting the fallback_group_id field in the database.
+	FieldFallbackGroupID = "fallback_group_id"
 	// FieldValidityDays holds the string denoting the validity_days field in the database.
 	FieldValidityDays = "validity_days"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -71,6 +73,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldExpiresAt,
 	FieldGroupID,
+	FieldFallbackGroupID,
 	FieldValidityDays,
 }
 
@@ -159,6 +162,11 @@ func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 // ByGroupID orders the results by the group_id field.
 func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
+}
+
+// ByFallbackGroupID orders the results by the fallback_group_id field.
+func ByFallbackGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFallbackGroupID, opts...).ToFunc()
 }
 
 // ByValidityDays orders the results by the validity_days field.

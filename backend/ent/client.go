@@ -51,6 +51,7 @@ import (
 	"github.com/Wei-Shaw/sub2api/ent/userallowedgroup"
 	"github.com/Wei-Shaw/sub2api/ent/userattributedefinition"
 	"github.com/Wei-Shaw/sub2api/ent/userattributevalue"
+	"github.com/Wei-Shaw/sub2api/ent/usergroupentitlement"
 	"github.com/Wei-Shaw/sub2api/ent/userplatformquota"
 	"github.com/Wei-Shaw/sub2api/ent/usersubscription"
 
@@ -134,6 +135,8 @@ type Client struct {
 	UserAttributeDefinition *UserAttributeDefinitionClient
 	// UserAttributeValue is the client for interacting with the UserAttributeValue builders.
 	UserAttributeValue *UserAttributeValueClient
+	// UserGroupEntitlement is the client for interacting with the UserGroupEntitlement builders.
+	UserGroupEntitlement *UserGroupEntitlementClient
 	// UserPlatformQuota is the client for interacting with the UserPlatformQuota builders.
 	UserPlatformQuota *UserPlatformQuotaClient
 	// UserSubscription is the client for interacting with the UserSubscription builders.
@@ -185,6 +188,7 @@ func (c *Client) init() {
 	c.UserAllowedGroup = NewUserAllowedGroupClient(c.config)
 	c.UserAttributeDefinition = NewUserAttributeDefinitionClient(c.config)
 	c.UserAttributeValue = NewUserAttributeValueClient(c.config)
+	c.UserGroupEntitlement = NewUserGroupEntitlementClient(c.config)
 	c.UserPlatformQuota = NewUserPlatformQuotaClient(c.config)
 	c.UserSubscription = NewUserSubscriptionClient(c.config)
 }
@@ -315,6 +319,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		UserAllowedGroup:              NewUserAllowedGroupClient(cfg),
 		UserAttributeDefinition:       NewUserAttributeDefinitionClient(cfg),
 		UserAttributeValue:            NewUserAttributeValueClient(cfg),
+		UserGroupEntitlement:          NewUserGroupEntitlementClient(cfg),
 		UserPlatformQuota:             NewUserPlatformQuotaClient(cfg),
 		UserSubscription:              NewUserSubscriptionClient(cfg),
 	}, nil
@@ -372,6 +377,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		UserAllowedGroup:              NewUserAllowedGroupClient(cfg),
 		UserAttributeDefinition:       NewUserAttributeDefinitionClient(cfg),
 		UserAttributeValue:            NewUserAttributeValueClient(cfg),
+		UserGroupEntitlement:          NewUserGroupEntitlementClient(cfg),
 		UserPlatformQuota:             NewUserPlatformQuotaClient(cfg),
 		UserSubscription:              NewUserSubscriptionClient(cfg),
 	}, nil
@@ -413,7 +419,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Proxy, c.RedeemCode, c.SecuritySecret, c.Setting, c.SubscriptionPlan,
 		c.TLSFingerprintProfile, c.UsageCleanupTask, c.UsageLog, c.User,
 		c.UserAllowedGroup, c.UserAttributeDefinition, c.UserAttributeValue,
-		c.UserPlatformQuota, c.UserSubscription,
+		c.UserGroupEntitlement, c.UserPlatformQuota, c.UserSubscription,
 	} {
 		n.Use(hooks...)
 	}
@@ -433,7 +439,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Proxy, c.RedeemCode, c.SecuritySecret, c.Setting, c.SubscriptionPlan,
 		c.TLSFingerprintProfile, c.UsageCleanupTask, c.UsageLog, c.User,
 		c.UserAllowedGroup, c.UserAttributeDefinition, c.UserAttributeValue,
-		c.UserPlatformQuota, c.UserSubscription,
+		c.UserGroupEntitlement, c.UserPlatformQuota, c.UserSubscription,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -514,6 +520,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.UserAttributeDefinition.mutate(ctx, m)
 	case *UserAttributeValueMutation:
 		return c.UserAttributeValue.mutate(ctx, m)
+	case *UserGroupEntitlementMutation:
+		return c.UserGroupEntitlement.mutate(ctx, m)
 	case *UserPlatformQuotaMutation:
 		return c.UserPlatformQuota.mutate(ctx, m)
 	case *UserSubscriptionMutation:
@@ -6313,6 +6321,139 @@ func (c *UserAttributeValueClient) mutate(ctx context.Context, m *UserAttributeV
 	}
 }
 
+// UserGroupEntitlementClient is a client for the UserGroupEntitlement schema.
+type UserGroupEntitlementClient struct {
+	config
+}
+
+// NewUserGroupEntitlementClient returns a client for the UserGroupEntitlement from the given config.
+func NewUserGroupEntitlementClient(c config) *UserGroupEntitlementClient {
+	return &UserGroupEntitlementClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `usergroupentitlement.Hooks(f(g(h())))`.
+func (c *UserGroupEntitlementClient) Use(hooks ...Hook) {
+	c.hooks.UserGroupEntitlement = append(c.hooks.UserGroupEntitlement, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `usergroupentitlement.Intercept(f(g(h())))`.
+func (c *UserGroupEntitlementClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UserGroupEntitlement = append(c.inters.UserGroupEntitlement, interceptors...)
+}
+
+// Create returns a builder for creating a UserGroupEntitlement entity.
+func (c *UserGroupEntitlementClient) Create() *UserGroupEntitlementCreate {
+	mutation := newUserGroupEntitlementMutation(c.config, OpCreate)
+	return &UserGroupEntitlementCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UserGroupEntitlement entities.
+func (c *UserGroupEntitlementClient) CreateBulk(builders ...*UserGroupEntitlementCreate) *UserGroupEntitlementCreateBulk {
+	return &UserGroupEntitlementCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *UserGroupEntitlementClient) MapCreateBulk(slice any, setFunc func(*UserGroupEntitlementCreate, int)) *UserGroupEntitlementCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &UserGroupEntitlementCreateBulk{err: fmt.Errorf("calling to UserGroupEntitlementClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*UserGroupEntitlementCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &UserGroupEntitlementCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UserGroupEntitlement.
+func (c *UserGroupEntitlementClient) Update() *UserGroupEntitlementUpdate {
+	mutation := newUserGroupEntitlementMutation(c.config, OpUpdate)
+	return &UserGroupEntitlementUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UserGroupEntitlementClient) UpdateOne(_m *UserGroupEntitlement) *UserGroupEntitlementUpdateOne {
+	mutation := newUserGroupEntitlementMutation(c.config, OpUpdateOne, withUserGroupEntitlement(_m))
+	return &UserGroupEntitlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UserGroupEntitlementClient) UpdateOneID(id int64) *UserGroupEntitlementUpdateOne {
+	mutation := newUserGroupEntitlementMutation(c.config, OpUpdateOne, withUserGroupEntitlementID(id))
+	return &UserGroupEntitlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UserGroupEntitlement.
+func (c *UserGroupEntitlementClient) Delete() *UserGroupEntitlementDelete {
+	mutation := newUserGroupEntitlementMutation(c.config, OpDelete)
+	return &UserGroupEntitlementDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UserGroupEntitlementClient) DeleteOne(_m *UserGroupEntitlement) *UserGroupEntitlementDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UserGroupEntitlementClient) DeleteOneID(id int64) *UserGroupEntitlementDeleteOne {
+	builder := c.Delete().Where(usergroupentitlement.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UserGroupEntitlementDeleteOne{builder}
+}
+
+// Query returns a query builder for UserGroupEntitlement.
+func (c *UserGroupEntitlementClient) Query() *UserGroupEntitlementQuery {
+	return &UserGroupEntitlementQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUserGroupEntitlement},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UserGroupEntitlement entity by its id.
+func (c *UserGroupEntitlementClient) Get(ctx context.Context, id int64) (*UserGroupEntitlement, error) {
+	return c.Query().Where(usergroupentitlement.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UserGroupEntitlementClient) GetX(ctx context.Context, id int64) *UserGroupEntitlement {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UserGroupEntitlementClient) Hooks() []Hook {
+	return c.hooks.UserGroupEntitlement
+}
+
+// Interceptors returns the client interceptors.
+func (c *UserGroupEntitlementClient) Interceptors() []Interceptor {
+	return c.inters.UserGroupEntitlement
+}
+
+func (c *UserGroupEntitlementClient) mutate(ctx context.Context, m *UserGroupEntitlementMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UserGroupEntitlementCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UserGroupEntitlementUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UserGroupEntitlementUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UserGroupEntitlementDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UserGroupEntitlement mutation op: %q", m.Op())
+	}
+}
+
 // UserPlatformQuotaClient is a client for the UserPlatformQuota schema.
 type UserPlatformQuotaClient struct {
 	config
@@ -6674,7 +6815,8 @@ type (
 		PaymentProviderInstance, PendingAuthSession, PromoCode, PromoCodeUsage, Proxy,
 		RedeemCode, SecuritySecret, Setting, SubscriptionPlan, TLSFingerprintProfile,
 		UsageCleanupTask, UsageLog, User, UserAllowedGroup, UserAttributeDefinition,
-		UserAttributeValue, UserPlatformQuota, UserSubscription []ent.Hook
+		UserAttributeValue, UserGroupEntitlement, UserPlatformQuota,
+		UserSubscription []ent.Hook
 	}
 	inters struct {
 		APIKey, Account, AccountGroup, Announcement, AnnouncementRead, AuthIdentity,
@@ -6685,7 +6827,8 @@ type (
 		PaymentProviderInstance, PendingAuthSession, PromoCode, PromoCodeUsage, Proxy,
 		RedeemCode, SecuritySecret, Setting, SubscriptionPlan, TLSFingerprintProfile,
 		UsageCleanupTask, UsageLog, User, UserAllowedGroup, UserAttributeDefinition,
-		UserAttributeValue, UserPlatformQuota, UserSubscription []ent.Interceptor
+		UserAttributeValue, UserGroupEntitlement, UserPlatformQuota,
+		UserSubscription []ent.Interceptor
 	}
 )
 

@@ -279,7 +279,13 @@ func (h *APIKeyHandler) GetAvailableGroups(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.apiKeyService.GetAvailableGroups(c.Request.Context(), subject.UserID)
+	var groups []service.Group
+	var err error
+	if c.Query("include_locked") == "true" {
+		groups, err = h.apiKeyService.GetAPIKeySelectorGroups(c.Request.Context(), subject.UserID)
+	} else {
+		groups, err = h.apiKeyService.GetAvailableGroups(c.Request.Context(), subject.UserID)
+	}
 	if err != nil {
 		response.ErrorFrom(c, err)
 		return

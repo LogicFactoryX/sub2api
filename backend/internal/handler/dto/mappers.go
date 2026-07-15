@@ -176,6 +176,7 @@ func groupFromServiceBase(g *service.Group) Group {
 		Platform:                        g.Platform,
 		RateMultiplier:                  g.RateMultiplier,
 		IsExclusive:                     g.IsExclusive,
+		ShowToAllUsers:                  g.ShowToAllUsers,
 		Status:                          g.Status,
 		SubscriptionType:                g.SubscriptionType,
 		DailyLimitUSD:                   g.DailyLimitUSD,
@@ -209,6 +210,8 @@ func groupFromServiceBase(g *service.Group) Group {
 		RPMLimit:                        g.RPMLimit,
 		CreatedAt:                       g.CreatedAt,
 		UpdatedAt:                       g.UpdatedAt,
+		AccessExpiresAt:                 g.AccessExpiresAt,
+		IsLocked:                        g.IsLocked,
 	}
 }
 
@@ -551,19 +554,20 @@ func RedeemCodeFromServiceAdmin(rc *service.RedeemCode) *AdminRedeemCode {
 
 func redeemCodeFromServiceBase(rc *service.RedeemCode) RedeemCode {
 	out := RedeemCode{
-		ID:           rc.ID,
-		Code:         rc.Code,
-		Type:         rc.Type,
-		Value:        rc.Value,
-		Status:       rc.Status,
-		UsedBy:       rc.UsedBy,
-		UsedAt:       rc.UsedAt,
-		CreatedAt:    rc.CreatedAt,
-		ExpiresAt:    rc.ExpiresAt,
-		GroupID:      rc.GroupID,
-		ValidityDays: rc.ValidityDays,
-		User:         UserFromServiceShallow(rc.User),
-		Group:        GroupFromServiceShallow(rc.Group),
+		ID:              rc.ID,
+		Code:            rc.Code,
+		Type:            rc.Type,
+		Value:           rc.Value,
+		Status:          rc.Status,
+		UsedBy:          rc.UsedBy,
+		UsedAt:          rc.UsedAt,
+		CreatedAt:       rc.CreatedAt,
+		ExpiresAt:       rc.ExpiresAt,
+		GroupID:         rc.GroupID,
+		FallbackGroupID: rc.FallbackGroupID,
+		ValidityDays:    rc.ValidityDays,
+		User:            UserFromServiceShallow(rc.User),
+		Group:           GroupFromServiceShallow(rc.Group),
 	}
 	if rc.IsExpired() {
 		out.Status = service.StatusExpired

@@ -1180,18 +1180,38 @@ func (s *adminServiceImpl) GenerateRedeemCodes(ctx context.Context, input *Gener
 		return nil, ErrRedeemCodeExpired
 	}
 
-	// 如果是订阅类型，验证必须有 GroupID
-	if input.Type == RedeemTypeSubscription {
+	// 订阅和分组卡都必须关联分组。
+	if input.Type == RedeemTypeSubscription || input.Type == RedeemTypeGroup {
 		if input.GroupID == nil {
-			return nil, errors.New("group_id is required for subscription type")
+			return nil, errors.New("group_id is required for subscription or group type")
 		}
-		// 验证分组存在且为订阅类型
 		group, err := s.groupRepo.GetByID(ctx, *input.GroupID)
 		if err != nil {
 			return nil, fmt.Errorf("group not found: %w", err)
 		}
-		if !group.IsSubscriptionType() {
+		if input.Type == RedeemTypeSubscription && !group.IsSubscriptionType() {
 			return nil, errors.New("group must be subscription type")
+		}
+		if input.Type == RedeemTypeGroup {
+			if group.IsSubscriptionType() || !group.IsActive() {
+				return nil, errors.New("group card target must be an active standard group")
+			}
+			if input.FallbackGroupID == nil {
+				return nil, errors.New("fallback_group_id is required for group type")
+			}
+			if *input.FallbackGroupID == *input.GroupID {
+				return nil, errors.New("fallback group must differ from target group")
+			}
+			fallback, err := s.groupRepo.GetByID(ctx, *input.FallbackGroupID)
+			if err != nil {
+				return nil, fmt.Errorf("fallback group not found: %w", err)
+			}
+			if fallback.IsSubscriptionType() || fallback.IsExclusive || !fallback.IsActive() || fallback.Platform != group.Platform {
+				return nil, errors.New("fallback group must be an active, non-exclusive standard group on the same platform")
+			}
+			if input.ValidityDays <= 0 {
+				return nil, errors.New("validity_days must be greater than zero for group type")
+			}
 		}
 	}
 
@@ -1209,8 +1229,9 @@ func (s *adminServiceImpl) GenerateRedeemCodes(ctx context.Context, input *Gener
 			ExpiresAt: input.ExpiresAt,
 		}
 		// 订阅类型专用字段
-		if input.Type == RedeemTypeSubscription {
+		if input.Type == RedeemTypeSubscription || input.Type == RedeemTypeGroup {
 			code.GroupID = input.GroupID
+			code.FallbackGroupID = input.FallbackGroupID
 			code.ValidityDays = input.ValidityDays
 			if code.ValidityDays <= 0 {
 				code.ValidityDays = 30 // 默认30天

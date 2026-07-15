@@ -202,6 +202,7 @@ type CreateGroupInput struct {
 	Platform         string
 	RateMultiplier   float64
 	IsExclusive      bool
+	ShowToAllUsers   bool
 	SubscriptionType string   // standard/subscription
 	DailyLimitUSD    *float64 // 日限额 (USD)
 	WeeklyLimitUSD   *float64 // 周限额 (USD)
@@ -257,6 +258,7 @@ type UpdateGroupInput struct {
 	Platform         string
 	RateMultiplier   *float64 // 使用指针以支持设置为0
 	IsExclusive      *bool
+	ShowToAllUsers   *bool
 	Status           string
 	SubscriptionType string   // standard/subscription
 	DailyLimitUSD    *float64 // 日限额 (USD)
@@ -458,12 +460,13 @@ type UpdateProxyInput struct {
 }
 
 type GenerateRedeemCodesInput struct {
-	Count        int
-	Type         string
-	Value        float64
-	GroupID      *int64 // 订阅类型专用：关联的分组ID
-	ValidityDays int    // 订阅类型专用：有效天数
-	ExpiresAt    *time.Time
+	Count           int
+	Type            string
+	Value           float64
+	GroupID         *int64 // 订阅类型专用：关联的分组ID
+	FallbackGroupID *int64 // 分组卡到期后 API Key 迁移到的分组
+	ValidityDays    int    // 订阅或分组卡有效天数
+	ExpiresAt       *time.Time
 }
 
 type ProxyBatchDeleteResult struct {

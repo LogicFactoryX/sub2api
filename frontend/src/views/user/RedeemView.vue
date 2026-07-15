@@ -114,6 +114,11 @@
                         }})</span
                       >
                     </p>
+                    <p v-else-if="redeemResult.type === 'group'" class="font-medium">
+                      {{ t('redeem.groupAccessGranted') }}
+                      <span v-if="redeemResult.group?.name"> - {{ redeemResult.group.name }}</span>
+                      <span v-if="redeemResult.validity_days"> ({{ t('redeem.subscriptionDays', { days: redeemResult.validity_days }) }})</span>
+                    </p>
                     <p v-if="redeemResult.new_balance !== undefined">
                       {{ t('redeem.newBalance') }}:
                       <span class="font-semibold">${{ redeemResult.new_balance.toFixed(2) }}</span>
@@ -369,6 +374,9 @@ const redeemResult = ref<{
   new_concurrency?: number
   group_name?: string
   validity_days?: number
+  group_id?: number
+  fallback_group_id?: number
+  group?: { id: number; name: string }
 } | null>(null)
 const errorMessage = ref('')
 

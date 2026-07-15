@@ -38,6 +38,8 @@ const (
 	FieldPeakRateMultiplier = "peak_rate_multiplier"
 	// FieldIsExclusive holds the string denoting the is_exclusive field in the database.
 	FieldIsExclusive = "is_exclusive"
+	// FieldShowToAllUsers holds the string denoting the show_to_all_users field in the database.
+	FieldShowToAllUsers = "show_to_all_users"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldPlatform holds the string denoting the platform field in the database.
@@ -198,6 +200,7 @@ var Columns = []string{
 	FieldPeakEnd,
 	FieldPeakRateMultiplier,
 	FieldIsExclusive,
+	FieldShowToAllUsers,
 	FieldStatus,
 	FieldPlatform,
 	FieldSubscriptionType,
@@ -288,6 +291,8 @@ var (
 	DefaultPeakRateMultiplier float64
 	// DefaultIsExclusive holds the default value on creation for the "is_exclusive" field.
 	DefaultIsExclusive bool
+	// DefaultShowToAllUsers holds the default value on creation for the "show_to_all_users" field.
+	DefaultShowToAllUsers bool
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus string
 	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
@@ -407,6 +412,11 @@ func ByPeakRateMultiplier(opts ...sql.OrderTermOption) OrderOption {
 // ByIsExclusive orders the results by the is_exclusive field.
 func ByIsExclusive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsExclusive, opts...).ToFunc()
+}
+
+// ByShowToAllUsers orders the results by the show_to_all_users field.
+func ByShowToAllUsers(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShowToAllUsers, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

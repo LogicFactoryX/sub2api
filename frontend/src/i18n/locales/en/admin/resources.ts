@@ -249,6 +249,7 @@ export default {
       balance: 'Balance',
       concurrency: 'Concurrency',
       subscription: 'Subscription',
+      groupCard: 'Group Card',
       invitation: 'Invitation',
       invitationHint: 'Invitation codes are used to restrict user registration. They are automatically marked as used after use.',
       unused: 'Unused',
@@ -315,6 +316,7 @@ export default {
         balance: 'Balance',
         concurrency: 'Concurrency',
         subscription: 'Subscription',
+        group: 'Group Card',
         invitation: 'Invitation',
         // Admin adjustment types (created when admin modifies user balance/concurrency)
         admin_balance: 'Balance (Admin)',
@@ -330,6 +332,12 @@ export default {
       customExpiryDays: 'Custom days',
       expiryDaysRequired: 'Please enter a valid expiry day count',
       groupRequired: 'Please select a subscription group',
+      groupCardTarget: 'Granted Group',
+      groupCardTargetPlaceholder: 'Choose the group granted by this card',
+      fallbackGroup: 'Group After Expiry',
+      fallbackGroupPlaceholder: 'Choose the group API keys move to',
+      fallbackGroupHint: 'When access expires, API keys still using the granted group move here automatically.',
+      fallbackGroupRequired: 'Please select the group used after expiry',
       days: ' days',
       status: {
         unused: 'Unused',

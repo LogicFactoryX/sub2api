@@ -23,6 +23,9 @@
     <span v-if="hasPeakRate" :class="peakRateClass" :title="peakRateTitle">
       {{ peakRateText }}
     </span>
+    <span v-if="accessExpiresAt" :class="accessExpiryClass" :title="accessExpiryText">
+      {{ accessExpiryText }}
+    </span>
   </span>
 </template>
 
@@ -32,6 +35,7 @@ import { useI18n } from 'vue-i18n'
 import type { SubscriptionType, GroupPlatform } from '@/types'
 import { useAppStore } from '@/stores/app'
 import { formatPeakRateWindow, serverTimezoneLabel } from '@/utils/peak-rate'
+import { formatDateTime } from '@/utils/format'
 import PlatformIcon from './PlatformIcon.vue'
 
 interface Props {
@@ -52,6 +56,7 @@ interface Props {
    * 只关心费率、不关心有效期的场景）。
    */
   alwaysShowRate?: boolean
+  accessExpiresAt?: string | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -167,6 +172,21 @@ const labelClass = computed(() => {
 
 const peakRateClass = computed(() => {
   return 'px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+})
+
+const accessExpiryText = computed(() => {
+  if (!props.accessExpiresAt) return ''
+  return t('keys.groupAccessExpiresAt', { time: formatDateTime(props.accessExpiresAt) })
+})
+
+const accessExpiryClass = computed(() => {
+  if (!props.accessExpiresAt) return ''
+  const remaining = new Date(props.accessExpiresAt).getTime() - Date.now()
+  const urgent = remaining <= 3 * 24 * 60 * 60 * 1000
+  const base = 'px-1.5 py-0.5 rounded text-[10px] font-semibold whitespace-nowrap'
+  return urgent
+    ? `${base} bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300`
+    : `${base} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`
 })
 
 // Badge color based on platform and subscription type

@@ -987,9 +987,8 @@ func (r *userRepository) loadAllowedGroups(ctx context.Context, userIDs []int64)
 	if err != nil {
 		return nil, err
 	}
-
-	for i := range rows {
-		out[rows[i].UserID] = append(out[rows[i].UserID], rows[i].GroupID)
+	for _, row := range rows {
+		out[row.UserID] = append(out[row.UserID], row.GroupID)
 	}
 
 	for userID := range out {

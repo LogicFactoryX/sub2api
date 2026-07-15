@@ -175,6 +175,20 @@ func (_c *GroupCreate) SetNillableIsExclusive(v *bool) *GroupCreate {
 	return _c
 }
 
+// SetShowToAllUsers sets the "show_to_all_users" field.
+func (_c *GroupCreate) SetShowToAllUsers(v bool) *GroupCreate {
+	_c.mutation.SetShowToAllUsers(v)
+	return _c
+}
+
+// SetNillableShowToAllUsers sets the "show_to_all_users" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableShowToAllUsers(v *bool) *GroupCreate {
+	if v != nil {
+		_c.SetShowToAllUsers(*v)
+	}
+	return _c
+}
+
 // SetStatus sets the "status" field.
 func (_c *GroupCreate) SetStatus(v string) *GroupCreate {
 	_c.mutation.SetStatus(v)
@@ -842,6 +856,10 @@ func (_c *GroupCreate) defaults() error {
 		v := group.DefaultIsExclusive
 		_c.mutation.SetIsExclusive(v)
 	}
+	if _, ok := _c.mutation.ShowToAllUsers(); !ok {
+		v := group.DefaultShowToAllUsers
+		_c.mutation.SetShowToAllUsers(v)
+	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := group.DefaultStatus
 		_c.mutation.SetStatus(v)
@@ -984,6 +1002,9 @@ func (_c *GroupCreate) check() error {
 	}
 	if _, ok := _c.mutation.IsExclusive(); !ok {
 		return &ValidationError{Name: "is_exclusive", err: errors.New(`ent: missing required field "Group.is_exclusive"`)}
+	}
+	if _, ok := _c.mutation.ShowToAllUsers(); !ok {
+		return &ValidationError{Name: "show_to_all_users", err: errors.New(`ent: missing required field "Group.show_to_all_users"`)}
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Group.status"`)}
@@ -1147,6 +1168,10 @@ func (_c *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.IsExclusive(); ok {
 		_spec.SetField(group.FieldIsExclusive, field.TypeBool, value)
 		_node.IsExclusive = value
+	}
+	if value, ok := _c.mutation.ShowToAllUsers(); ok {
+		_spec.SetField(group.FieldShowToAllUsers, field.TypeBool, value)
+		_node.ShowToAllUsers = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(group.FieldStatus, field.TypeString, value)
@@ -1593,6 +1618,18 @@ func (u *GroupUpsert) SetIsExclusive(v bool) *GroupUpsert {
 // UpdateIsExclusive sets the "is_exclusive" field to the value that was provided on create.
 func (u *GroupUpsert) UpdateIsExclusive() *GroupUpsert {
 	u.SetExcluded(group.FieldIsExclusive)
+	return u
+}
+
+// SetShowToAllUsers sets the "show_to_all_users" field.
+func (u *GroupUpsert) SetShowToAllUsers(v bool) *GroupUpsert {
+	u.Set(group.FieldShowToAllUsers, v)
+	return u
+}
+
+// UpdateShowToAllUsers sets the "show_to_all_users" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateShowToAllUsers() *GroupUpsert {
+	u.SetExcluded(group.FieldShowToAllUsers)
 	return u
 }
 
@@ -2442,6 +2479,20 @@ func (u *GroupUpsertOne) SetIsExclusive(v bool) *GroupUpsertOne {
 func (u *GroupUpsertOne) UpdateIsExclusive() *GroupUpsertOne {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateIsExclusive()
+	})
+}
+
+// SetShowToAllUsers sets the "show_to_all_users" field.
+func (u *GroupUpsertOne) SetShowToAllUsers(v bool) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetShowToAllUsers(v)
+	})
+}
+
+// UpdateShowToAllUsers sets the "show_to_all_users" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateShowToAllUsers() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateShowToAllUsers()
 	})
 }
 
@@ -3563,6 +3614,20 @@ func (u *GroupUpsertBulk) SetIsExclusive(v bool) *GroupUpsertBulk {
 func (u *GroupUpsertBulk) UpdateIsExclusive() *GroupUpsertBulk {
 	return u.Update(func(s *GroupUpsert) {
 		s.UpdateIsExclusive()
+	})
+}
+
+// SetShowToAllUsers sets the "show_to_all_users" field.
+func (u *GroupUpsertBulk) SetShowToAllUsers(v bool) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetShowToAllUsers(v)
+	})
+}
+
+// UpdateShowToAllUsers sets the "show_to_all_users" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateShowToAllUsers() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateShowToAllUsers()
 	})
 }
 

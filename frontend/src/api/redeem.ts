@@ -18,6 +18,7 @@ export interface RedeemHistoryItem {
   notes?: string
   // Subscription-specific fields
   group_id?: number
+  fallback_group_id?: number
   validity_days?: number
   group?: {
     id: number
@@ -36,6 +37,10 @@ export async function redeem(code: string): Promise<{
   value: number
   new_balance?: number
   new_concurrency?: number
+  group_id?: number
+  fallback_group_id?: number
+  validity_days?: number
+  group?: { id: number; name: string }
 }> {
   const payload: RedeemCodeRequest = { code }
 
@@ -45,6 +50,10 @@ export async function redeem(code: string): Promise<{
     value: number
     new_balance?: number
     new_concurrency?: number
+    group_id?: number
+    fallback_group_id?: number
+    validity_days?: number
+    group?: { id: number; name: string }
   }>('/redeem', payload)
 
   return data
