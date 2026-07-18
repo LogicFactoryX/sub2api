@@ -844,7 +844,8 @@ var (
 		{Name: "peak_end", Type: field.TypeString, Size: 5, Default: ""},
 		{Name: "peak_rate_multiplier", Type: field.TypeFloat64, Default: 1, SchemaType: map[string]string{"postgres": "decimal(10,4)"}},
 		{Name: "is_exclusive", Type: field.TypeBool, Default: false},
-		{Name: "show_to_all_users", Type: field.TypeBool, Default: false},
+		{Name: "is_member_group", Type: field.TypeBool, Default: false},
+		{Name: "member_fallback_group_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "status", Type: field.TypeString, Size: 20, Default: "active"},
 		{Name: "platform", Type: field.TypeString, Size: 50, Default: "anthropic"},
 		{Name: "subscription_type", Type: field.TypeString, Size: 20, Default: "standard"},
@@ -892,22 +893,27 @@ var (
 			{
 				Name:    "group_status",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[13]},
+				Columns: []*schema.Column{GroupsColumns[14]},
 			},
 			{
 				Name:    "group_platform",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[14]},
+				Columns: []*schema.Column{GroupsColumns[15]},
 			},
 			{
 				Name:    "group_subscription_type",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[15]},
+				Columns: []*schema.Column{GroupsColumns[16]},
 			},
 			{
 				Name:    "group_is_exclusive",
 				Unique:  false,
 				Columns: []*schema.Column{GroupsColumns[11]},
+			},
+			{
+				Name:    "group_is_member_group",
+				Unique:  false,
+				Columns: []*schema.Column{GroupsColumns[12]},
 			},
 			{
 				Name:    "group_deleted_at",
@@ -917,7 +923,7 @@ var (
 			{
 				Name:    "group_sort_order",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[42]},
+				Columns: []*schema.Column{GroupsColumns[43]},
 			},
 		},
 	}

@@ -194,17 +194,44 @@ func (_u *GroupUpdate) SetNillableIsExclusive(v *bool) *GroupUpdate {
 	return _u
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (_u *GroupUpdate) SetShowToAllUsers(v bool) *GroupUpdate {
-	_u.mutation.SetShowToAllUsers(v)
+// SetIsMemberGroup sets the "is_member_group" field.
+func (_u *GroupUpdate) SetIsMemberGroup(v bool) *GroupUpdate {
+	_u.mutation.SetIsMemberGroup(v)
 	return _u
 }
 
-// SetNillableShowToAllUsers sets the "show_to_all_users" field if the given value is not nil.
-func (_u *GroupUpdate) SetNillableShowToAllUsers(v *bool) *GroupUpdate {
+// SetNillableIsMemberGroup sets the "is_member_group" field if the given value is not nil.
+func (_u *GroupUpdate) SetNillableIsMemberGroup(v *bool) *GroupUpdate {
 	if v != nil {
-		_u.SetShowToAllUsers(*v)
+		_u.SetIsMemberGroup(*v)
 	}
+	return _u
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (_u *GroupUpdate) SetMemberFallbackGroupID(v int64) *GroupUpdate {
+	_u.mutation.ResetMemberFallbackGroupID()
+	_u.mutation.SetMemberFallbackGroupID(v)
+	return _u
+}
+
+// SetNillableMemberFallbackGroupID sets the "member_fallback_group_id" field if the given value is not nil.
+func (_u *GroupUpdate) SetNillableMemberFallbackGroupID(v *int64) *GroupUpdate {
+	if v != nil {
+		_u.SetMemberFallbackGroupID(*v)
+	}
+	return _u
+}
+
+// AddMemberFallbackGroupID adds value to the "member_fallback_group_id" field.
+func (_u *GroupUpdate) AddMemberFallbackGroupID(v int64) *GroupUpdate {
+	_u.mutation.AddMemberFallbackGroupID(v)
+	return _u
+}
+
+// ClearMemberFallbackGroupID clears the value of the "member_fallback_group_id" field.
+func (_u *GroupUpdate) ClearMemberFallbackGroupID() *GroupUpdate {
+	_u.mutation.ClearMemberFallbackGroupID()
 	return _u
 }
 
@@ -1284,8 +1311,17 @@ func (_u *GroupUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.IsExclusive(); ok {
 		_spec.SetField(group.FieldIsExclusive, field.TypeBool, value)
 	}
-	if value, ok := _u.mutation.ShowToAllUsers(); ok {
-		_spec.SetField(group.FieldShowToAllUsers, field.TypeBool, value)
+	if value, ok := _u.mutation.IsMemberGroup(); ok {
+		_spec.SetField(group.FieldIsMemberGroup, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.MemberFallbackGroupID(); ok {
+		_spec.SetField(group.FieldMemberFallbackGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedMemberFallbackGroupID(); ok {
+		_spec.AddField(group.FieldMemberFallbackGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.MemberFallbackGroupIDCleared() {
+		_spec.ClearField(group.FieldMemberFallbackGroupID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(group.FieldStatus, field.TypeString, value)
@@ -1971,17 +2007,44 @@ func (_u *GroupUpdateOne) SetNillableIsExclusive(v *bool) *GroupUpdateOne {
 	return _u
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (_u *GroupUpdateOne) SetShowToAllUsers(v bool) *GroupUpdateOne {
-	_u.mutation.SetShowToAllUsers(v)
+// SetIsMemberGroup sets the "is_member_group" field.
+func (_u *GroupUpdateOne) SetIsMemberGroup(v bool) *GroupUpdateOne {
+	_u.mutation.SetIsMemberGroup(v)
 	return _u
 }
 
-// SetNillableShowToAllUsers sets the "show_to_all_users" field if the given value is not nil.
-func (_u *GroupUpdateOne) SetNillableShowToAllUsers(v *bool) *GroupUpdateOne {
+// SetNillableIsMemberGroup sets the "is_member_group" field if the given value is not nil.
+func (_u *GroupUpdateOne) SetNillableIsMemberGroup(v *bool) *GroupUpdateOne {
 	if v != nil {
-		_u.SetShowToAllUsers(*v)
+		_u.SetIsMemberGroup(*v)
 	}
+	return _u
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (_u *GroupUpdateOne) SetMemberFallbackGroupID(v int64) *GroupUpdateOne {
+	_u.mutation.ResetMemberFallbackGroupID()
+	_u.mutation.SetMemberFallbackGroupID(v)
+	return _u
+}
+
+// SetNillableMemberFallbackGroupID sets the "member_fallback_group_id" field if the given value is not nil.
+func (_u *GroupUpdateOne) SetNillableMemberFallbackGroupID(v *int64) *GroupUpdateOne {
+	if v != nil {
+		_u.SetMemberFallbackGroupID(*v)
+	}
+	return _u
+}
+
+// AddMemberFallbackGroupID adds value to the "member_fallback_group_id" field.
+func (_u *GroupUpdateOne) AddMemberFallbackGroupID(v int64) *GroupUpdateOne {
+	_u.mutation.AddMemberFallbackGroupID(v)
+	return _u
+}
+
+// ClearMemberFallbackGroupID clears the value of the "member_fallback_group_id" field.
+func (_u *GroupUpdateOne) ClearMemberFallbackGroupID() *GroupUpdateOne {
+	_u.mutation.ClearMemberFallbackGroupID()
 	return _u
 }
 
@@ -3091,8 +3154,17 @@ func (_u *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error)
 	if value, ok := _u.mutation.IsExclusive(); ok {
 		_spec.SetField(group.FieldIsExclusive, field.TypeBool, value)
 	}
-	if value, ok := _u.mutation.ShowToAllUsers(); ok {
-		_spec.SetField(group.FieldShowToAllUsers, field.TypeBool, value)
+	if value, ok := _u.mutation.IsMemberGroup(); ok {
+		_spec.SetField(group.FieldIsMemberGroup, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.MemberFallbackGroupID(); ok {
+		_spec.SetField(group.FieldMemberFallbackGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedMemberFallbackGroupID(); ok {
+		_spec.AddField(group.FieldMemberFallbackGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.MemberFallbackGroupIDCleared() {
+		_spec.ClearField(group.FieldMemberFallbackGroupID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(group.FieldStatus, field.TypeString, value)

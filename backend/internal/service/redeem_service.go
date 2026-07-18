@@ -142,7 +142,7 @@ type RedeemService struct {
 	entClient            *dbent.Client
 	authCacheInvalidator APIKeyAuthCacheInvalidator
 	affiliateService     *AffiliateService
-	groupEntitlementRepo GroupEntitlementRepository
+	membershipRepo       MembershipRepository
 }
 
 // NewRedeemService 创建兑换码服务实例
@@ -170,8 +170,8 @@ func NewRedeemService(
 	}
 }
 
-func (s *RedeemService) SetGroupEntitlementRepository(repo GroupEntitlementRepository) {
-	s.groupEntitlementRepo = repo
+func (s *RedeemService) SetMembershipRepository(repo MembershipRepository) {
+	s.membershipRepo = repo
 }
 
 // GenerateRandomCode 生成随机兑换码
@@ -259,7 +259,7 @@ func (s *RedeemService) CreateCode(ctx context.Context, code *RedeemCode) error 
 	if code.Type == "" {
 		code.Type = RedeemTypeBalance
 	}
-	if code.Type != RedeemTypeInvitation && code.Type != RedeemTypeGroup && code.Value == 0 {
+	if code.Type != RedeemTypeInvitation && code.Type != RedeemTypeMembership && code.Value == 0 {
 		return errors.New("value must not be zero")
 	}
 	if code.Status == "" {
@@ -429,9 +429,9 @@ func (s *RedeemService) Redeem(ctx context.Context, userID int64, code string) (
 		if redeemCode.GroupID == nil {
 			return nil, infraerrors.BadRequest("REDEEM_CODE_INVALID", "invalid subscription redeem code: missing group_id")
 		}
-	case RedeemTypeGroup:
-		if redeemCode.GroupID == nil || redeemCode.FallbackGroupID == nil || redeemCode.ValidityDays <= 0 {
-			return nil, infraerrors.BadRequest("REDEEM_CODE_INVALID", "invalid group redeem code configuration")
+	case RedeemTypeMembership:
+		if redeemCode.ValidityDays <= 0 {
+			return nil, infraerrors.BadRequest("REDEEM_CODE_INVALID", "invalid membership redeem code configuration")
 		}
 	default:
 		return nil, unsupportedRedeemTypeError(redeemCode.Type)
@@ -513,23 +513,17 @@ func (s *RedeemService) Redeem(ctx context.Context, userID int64, code string) (
 			}
 		}
 
-	case RedeemTypeGroup:
-		if s.groupEntitlementRepo == nil {
-			return nil, errors.New("group entitlement repository is not configured")
+	case RedeemTypeMembership:
+		if s.membershipRepo == nil {
+			return nil, errors.New("membership repository is not configured")
 		}
-		startsAt := time.Now().UTC()
-		expiresAt := startsAt.AddDate(0, 0, redeemCode.ValidityDays)
-		if err := s.groupEntitlementRepo.Grant(
-			txCtx,
-			userID,
-			redeemCode.ID,
-			*redeemCode.GroupID,
-			*redeemCode.FallbackGroupID,
-			startsAt,
-			expiresAt,
-		); err != nil {
-			return nil, fmt.Errorf("grant group entitlement: %w", err)
+		expiresAt, err := s.membershipRepo.GrantOrExtend(
+			txCtx, userID, redeemCode.ID, redeemCode.ValidityDays, time.Now().UTC(),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("grant or extend membership: %w", err)
 		}
+		redeemCode.MembershipExpiresAt = &expiresAt
 
 	default:
 		return nil, unsupportedRedeemTypeError(redeemCode.Type)
@@ -549,10 +543,12 @@ func (s *RedeemService) Redeem(ctx context.Context, userID int64, code string) (
 	}
 
 	// 重新获取更新后的兑换码
+	membershipExpiresAt := redeemCode.MembershipExpiresAt
 	redeemCode, err = s.redeemRepo.GetByID(ctx, redeemCode.ID)
 	if err != nil {
 		return nil, fmt.Errorf("get updated redeem code: %w", err)
 	}
+	redeemCode.MembershipExpiresAt = membershipExpiresAt
 
 	return redeemCode, nil
 }
@@ -594,7 +590,7 @@ func (s *RedeemService) invalidateRedeemCaches(ctx context.Context, userID int64
 				_ = s.billingCacheService.InvalidateSubscription(cacheCtx, userID, groupID)
 			}()
 		}
-	case RedeemTypeGroup:
+	case RedeemTypeMembership:
 		if s.authCacheInvalidator != nil {
 			s.authCacheInvalidator.InvalidateAuthCacheByUserID(ctx, userID)
 		}

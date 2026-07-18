@@ -578,6 +578,7 @@ export default {
       groupConfig: '用户分组配置',
       groupConfigHint: '为用户 {email} 配置专属分组倍率（覆盖分组默认倍率）',
       exclusiveGroups: '专属分组',
+      memberGroups: '会员分组（会员默认可用）',
       publicGroups: '公开分组（默认可用）',
       defaultRate: '默认倍率',
       customRate: '专属倍率',
@@ -809,8 +810,10 @@ export default {
         no: '否'
       },
       exclusive: '专属',
-      showToAllUsers: '向所有用户展示',
-      showToAllUsersHint: '未解锁用户可以看到该分组和优惠倍率，但不能选择使用。',
+      memberGroup: '会员分组',
+      memberGroupHint: '所有用户可见，只有有效会员才能选择和使用。',
+      memberFallbackGroup: '会员到期回退分组',
+      memberFallbackRequired: '请选择会员到期后的公开回退分组',
       exclusiveHint: '专属分组，可以手动指定给特定用户',
       exclusiveTooltip: {
         title: '什么是专属分组？',

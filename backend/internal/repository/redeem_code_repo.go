@@ -420,10 +420,14 @@ func redeemCodeEntityToService(m *dbent.RedeemCode) *service.RedeemCode {
 	if m == nil {
 		return nil
 	}
+	codeType := m.Type
+	if codeType == "group" {
+		codeType = service.RedeemTypeMembership
+	}
 	out := &service.RedeemCode{
 		ID:              m.ID,
 		Code:            m.Code,
-		Type:            m.Type,
+		Type:            codeType,
 		Value:           m.Value,
 		Status:          m.Status,
 		UsedBy:          m.UsedBy,

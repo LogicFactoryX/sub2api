@@ -20809,7 +20809,9 @@ type GroupMutation struct {
 	peak_rate_multiplier                    *float64
 	addpeak_rate_multiplier                 *float64
 	is_exclusive                            *bool
-	show_to_all_users                       *bool
+	is_member_group                         *bool
+	member_fallback_group_id                *int64
+	addmember_fallback_group_id             *int64
 	status                                  *string
 	platform                                *string
 	subscription_type                       *string
@@ -21451,40 +21453,110 @@ func (m *GroupMutation) ResetIsExclusive() {
 	m.is_exclusive = nil
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (m *GroupMutation) SetShowToAllUsers(b bool) {
-	m.show_to_all_users = &b
+// SetIsMemberGroup sets the "is_member_group" field.
+func (m *GroupMutation) SetIsMemberGroup(b bool) {
+	m.is_member_group = &b
 }
 
-// ShowToAllUsers returns the value of the "show_to_all_users" field in the mutation.
-func (m *GroupMutation) ShowToAllUsers() (r bool, exists bool) {
-	v := m.show_to_all_users
+// IsMemberGroup returns the value of the "is_member_group" field in the mutation.
+func (m *GroupMutation) IsMemberGroup() (r bool, exists bool) {
+	v := m.is_member_group
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldShowToAllUsers returns the old "show_to_all_users" field's value of the Group entity.
+// OldIsMemberGroup returns the old "is_member_group" field's value of the Group entity.
 // If the Group object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GroupMutation) OldShowToAllUsers(ctx context.Context) (v bool, err error) {
+func (m *GroupMutation) OldIsMemberGroup(ctx context.Context) (v bool, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldShowToAllUsers is only allowed on UpdateOne operations")
+		return v, errors.New("OldIsMemberGroup is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldShowToAllUsers requires an ID field in the mutation")
+		return v, errors.New("OldIsMemberGroup requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldShowToAllUsers: %w", err)
+		return v, fmt.Errorf("querying old value for OldIsMemberGroup: %w", err)
 	}
-	return oldValue.ShowToAllUsers, nil
+	return oldValue.IsMemberGroup, nil
 }
 
-// ResetShowToAllUsers resets all changes to the "show_to_all_users" field.
-func (m *GroupMutation) ResetShowToAllUsers() {
-	m.show_to_all_users = nil
+// ResetIsMemberGroup resets all changes to the "is_member_group" field.
+func (m *GroupMutation) ResetIsMemberGroup() {
+	m.is_member_group = nil
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (m *GroupMutation) SetMemberFallbackGroupID(i int64) {
+	m.member_fallback_group_id = &i
+	m.addmember_fallback_group_id = nil
+}
+
+// MemberFallbackGroupID returns the value of the "member_fallback_group_id" field in the mutation.
+func (m *GroupMutation) MemberFallbackGroupID() (r int64, exists bool) {
+	v := m.member_fallback_group_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMemberFallbackGroupID returns the old "member_fallback_group_id" field's value of the Group entity.
+// If the Group object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GroupMutation) OldMemberFallbackGroupID(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMemberFallbackGroupID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMemberFallbackGroupID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMemberFallbackGroupID: %w", err)
+	}
+	return oldValue.MemberFallbackGroupID, nil
+}
+
+// AddMemberFallbackGroupID adds i to the "member_fallback_group_id" field.
+func (m *GroupMutation) AddMemberFallbackGroupID(i int64) {
+	if m.addmember_fallback_group_id != nil {
+		*m.addmember_fallback_group_id += i
+	} else {
+		m.addmember_fallback_group_id = &i
+	}
+}
+
+// AddedMemberFallbackGroupID returns the value that was added to the "member_fallback_group_id" field in this mutation.
+func (m *GroupMutation) AddedMemberFallbackGroupID() (r int64, exists bool) {
+	v := m.addmember_fallback_group_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearMemberFallbackGroupID clears the value of the "member_fallback_group_id" field.
+func (m *GroupMutation) ClearMemberFallbackGroupID() {
+	m.member_fallback_group_id = nil
+	m.addmember_fallback_group_id = nil
+	m.clearedFields[group.FieldMemberFallbackGroupID] = struct{}{}
+}
+
+// MemberFallbackGroupIDCleared returns if the "member_fallback_group_id" field was cleared in this mutation.
+func (m *GroupMutation) MemberFallbackGroupIDCleared() bool {
+	_, ok := m.clearedFields[group.FieldMemberFallbackGroupID]
+	return ok
+}
+
+// ResetMemberFallbackGroupID resets all changes to the "member_fallback_group_id" field.
+func (m *GroupMutation) ResetMemberFallbackGroupID() {
+	m.member_fallback_group_id = nil
+	m.addmember_fallback_group_id = nil
+	delete(m.clearedFields, group.FieldMemberFallbackGroupID)
 }
 
 // SetStatus sets the "status" field.
@@ -23753,7 +23825,7 @@ func (m *GroupMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GroupMutation) Fields() []string {
-	fields := make([]string, 0, 49)
+	fields := make([]string, 0, 50)
 	if m.created_at != nil {
 		fields = append(fields, group.FieldCreatedAt)
 	}
@@ -23787,8 +23859,11 @@ func (m *GroupMutation) Fields() []string {
 	if m.is_exclusive != nil {
 		fields = append(fields, group.FieldIsExclusive)
 	}
-	if m.show_to_all_users != nil {
-		fields = append(fields, group.FieldShowToAllUsers)
+	if m.is_member_group != nil {
+		fields = append(fields, group.FieldIsMemberGroup)
+	}
+	if m.member_fallback_group_id != nil {
+		fields = append(fields, group.FieldMemberFallbackGroupID)
 	}
 	if m.status != nil {
 		fields = append(fields, group.FieldStatus)
@@ -23931,8 +24006,10 @@ func (m *GroupMutation) Field(name string) (ent.Value, bool) {
 		return m.PeakRateMultiplier()
 	case group.FieldIsExclusive:
 		return m.IsExclusive()
-	case group.FieldShowToAllUsers:
-		return m.ShowToAllUsers()
+	case group.FieldIsMemberGroup:
+		return m.IsMemberGroup()
+	case group.FieldMemberFallbackGroupID:
+		return m.MemberFallbackGroupID()
 	case group.FieldStatus:
 		return m.Status()
 	case group.FieldPlatform:
@@ -24038,8 +24115,10 @@ func (m *GroupMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldPeakRateMultiplier(ctx)
 	case group.FieldIsExclusive:
 		return m.OldIsExclusive(ctx)
-	case group.FieldShowToAllUsers:
-		return m.OldShowToAllUsers(ctx)
+	case group.FieldIsMemberGroup:
+		return m.OldIsMemberGroup(ctx)
+	case group.FieldMemberFallbackGroupID:
+		return m.OldMemberFallbackGroupID(ctx)
 	case group.FieldStatus:
 		return m.OldStatus(ctx)
 	case group.FieldPlatform:
@@ -24200,12 +24279,19 @@ func (m *GroupMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetIsExclusive(v)
 		return nil
-	case group.FieldShowToAllUsers:
+	case group.FieldIsMemberGroup:
 		v, ok := value.(bool)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetShowToAllUsers(v)
+		m.SetIsMemberGroup(v)
+		return nil
+	case group.FieldMemberFallbackGroupID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMemberFallbackGroupID(v)
 		return nil
 	case group.FieldStatus:
 		v, ok := value.(string)
@@ -24480,6 +24566,9 @@ func (m *GroupMutation) AddedFields() []string {
 	if m.addpeak_rate_multiplier != nil {
 		fields = append(fields, group.FieldPeakRateMultiplier)
 	}
+	if m.addmember_fallback_group_id != nil {
+		fields = append(fields, group.FieldMemberFallbackGroupID)
+	}
 	if m.adddaily_limit_usd != nil {
 		fields = append(fields, group.FieldDailyLimitUsd)
 	}
@@ -24549,6 +24638,8 @@ func (m *GroupMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedRateMultiplier()
 	case group.FieldPeakRateMultiplier:
 		return m.AddedPeakRateMultiplier()
+	case group.FieldMemberFallbackGroupID:
+		return m.AddedMemberFallbackGroupID()
 	case group.FieldDailyLimitUsd:
 		return m.AddedDailyLimitUsd()
 	case group.FieldWeeklyLimitUsd:
@@ -24609,6 +24700,13 @@ func (m *GroupMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddPeakRateMultiplier(v)
+		return nil
+	case group.FieldMemberFallbackGroupID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMemberFallbackGroupID(v)
 		return nil
 	case group.FieldDailyLimitUsd:
 		v, ok := value.(float64)
@@ -24757,6 +24855,9 @@ func (m *GroupMutation) ClearedFields() []string {
 	if m.FieldCleared(group.FieldDescription) {
 		fields = append(fields, group.FieldDescription)
 	}
+	if m.FieldCleared(group.FieldMemberFallbackGroupID) {
+		fields = append(fields, group.FieldMemberFallbackGroupID)
+	}
 	if m.FieldCleared(group.FieldDailyLimitUsd) {
 		fields = append(fields, group.FieldDailyLimitUsd)
 	}
@@ -24815,6 +24916,9 @@ func (m *GroupMutation) ClearField(name string) error {
 		return nil
 	case group.FieldDescription:
 		m.ClearDescription()
+		return nil
+	case group.FieldMemberFallbackGroupID:
+		m.ClearMemberFallbackGroupID()
 		return nil
 	case group.FieldDailyLimitUsd:
 		m.ClearDailyLimitUsd()
@@ -24896,8 +25000,11 @@ func (m *GroupMutation) ResetField(name string) error {
 	case group.FieldIsExclusive:
 		m.ResetIsExclusive()
 		return nil
-	case group.FieldShowToAllUsers:
-		m.ResetShowToAllUsers()
+	case group.FieldIsMemberGroup:
+		m.ResetIsMemberGroup()
+		return nil
+	case group.FieldMemberFallbackGroupID:
+		m.ResetMemberFallbackGroupID()
 		return nil
 	case group.FieldStatus:
 		m.ResetStatus()

@@ -38,8 +38,10 @@ const (
 	FieldPeakRateMultiplier = "peak_rate_multiplier"
 	// FieldIsExclusive holds the string denoting the is_exclusive field in the database.
 	FieldIsExclusive = "is_exclusive"
-	// FieldShowToAllUsers holds the string denoting the show_to_all_users field in the database.
-	FieldShowToAllUsers = "show_to_all_users"
+	// FieldIsMemberGroup holds the string denoting the is_member_group field in the database.
+	FieldIsMemberGroup = "is_member_group"
+	// FieldMemberFallbackGroupID holds the string denoting the member_fallback_group_id field in the database.
+	FieldMemberFallbackGroupID = "member_fallback_group_id"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
 	// FieldPlatform holds the string denoting the platform field in the database.
@@ -200,7 +202,8 @@ var Columns = []string{
 	FieldPeakEnd,
 	FieldPeakRateMultiplier,
 	FieldIsExclusive,
-	FieldShowToAllUsers,
+	FieldIsMemberGroup,
+	FieldMemberFallbackGroupID,
 	FieldStatus,
 	FieldPlatform,
 	FieldSubscriptionType,
@@ -291,8 +294,8 @@ var (
 	DefaultPeakRateMultiplier float64
 	// DefaultIsExclusive holds the default value on creation for the "is_exclusive" field.
 	DefaultIsExclusive bool
-	// DefaultShowToAllUsers holds the default value on creation for the "show_to_all_users" field.
-	DefaultShowToAllUsers bool
+	// DefaultIsMemberGroup holds the default value on creation for the "is_member_group" field.
+	DefaultIsMemberGroup bool
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus string
 	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
@@ -414,9 +417,14 @@ func ByIsExclusive(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsExclusive, opts...).ToFunc()
 }
 
-// ByShowToAllUsers orders the results by the show_to_all_users field.
-func ByShowToAllUsers(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldShowToAllUsers, opts...).ToFunc()
+// ByIsMemberGroup orders the results by the is_member_group field.
+func ByIsMemberGroup(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsMemberGroup, opts...).ToFunc()
+}
+
+// ByMemberFallbackGroupID orders the results by the member_fallback_group_id field.
+func ByMemberFallbackGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMemberFallbackGroupID, opts...).ToFunc()
 }
 
 // ByStatus orders the results by the status field.

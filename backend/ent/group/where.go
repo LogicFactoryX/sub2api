@@ -110,9 +110,14 @@ func IsExclusive(v bool) predicate.Group {
 	return predicate.Group(sql.FieldEQ(FieldIsExclusive, v))
 }
 
-// ShowToAllUsers applies equality check predicate on the "show_to_all_users" field. It's identical to ShowToAllUsersEQ.
-func ShowToAllUsers(v bool) predicate.Group {
-	return predicate.Group(sql.FieldEQ(FieldShowToAllUsers, v))
+// IsMemberGroup applies equality check predicate on the "is_member_group" field. It's identical to IsMemberGroupEQ.
+func IsMemberGroup(v bool) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldIsMemberGroup, v))
+}
+
+// MemberFallbackGroupID applies equality check predicate on the "member_fallback_group_id" field. It's identical to MemberFallbackGroupIDEQ.
+func MemberFallbackGroupID(v int64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldMemberFallbackGroupID, v))
 }
 
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
@@ -780,14 +785,64 @@ func IsExclusiveNEQ(v bool) predicate.Group {
 	return predicate.Group(sql.FieldNEQ(FieldIsExclusive, v))
 }
 
-// ShowToAllUsersEQ applies the EQ predicate on the "show_to_all_users" field.
-func ShowToAllUsersEQ(v bool) predicate.Group {
-	return predicate.Group(sql.FieldEQ(FieldShowToAllUsers, v))
+// IsMemberGroupEQ applies the EQ predicate on the "is_member_group" field.
+func IsMemberGroupEQ(v bool) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldIsMemberGroup, v))
 }
 
-// ShowToAllUsersNEQ applies the NEQ predicate on the "show_to_all_users" field.
-func ShowToAllUsersNEQ(v bool) predicate.Group {
-	return predicate.Group(sql.FieldNEQ(FieldShowToAllUsers, v))
+// IsMemberGroupNEQ applies the NEQ predicate on the "is_member_group" field.
+func IsMemberGroupNEQ(v bool) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldIsMemberGroup, v))
+}
+
+// MemberFallbackGroupIDEQ applies the EQ predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDEQ(v int64) predicate.Group {
+	return predicate.Group(sql.FieldEQ(FieldMemberFallbackGroupID, v))
+}
+
+// MemberFallbackGroupIDNEQ applies the NEQ predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDNEQ(v int64) predicate.Group {
+	return predicate.Group(sql.FieldNEQ(FieldMemberFallbackGroupID, v))
+}
+
+// MemberFallbackGroupIDIn applies the In predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDIn(vs ...int64) predicate.Group {
+	return predicate.Group(sql.FieldIn(FieldMemberFallbackGroupID, vs...))
+}
+
+// MemberFallbackGroupIDNotIn applies the NotIn predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDNotIn(vs ...int64) predicate.Group {
+	return predicate.Group(sql.FieldNotIn(FieldMemberFallbackGroupID, vs...))
+}
+
+// MemberFallbackGroupIDGT applies the GT predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDGT(v int64) predicate.Group {
+	return predicate.Group(sql.FieldGT(FieldMemberFallbackGroupID, v))
+}
+
+// MemberFallbackGroupIDGTE applies the GTE predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDGTE(v int64) predicate.Group {
+	return predicate.Group(sql.FieldGTE(FieldMemberFallbackGroupID, v))
+}
+
+// MemberFallbackGroupIDLT applies the LT predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDLT(v int64) predicate.Group {
+	return predicate.Group(sql.FieldLT(FieldMemberFallbackGroupID, v))
+}
+
+// MemberFallbackGroupIDLTE applies the LTE predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDLTE(v int64) predicate.Group {
+	return predicate.Group(sql.FieldLTE(FieldMemberFallbackGroupID, v))
+}
+
+// MemberFallbackGroupIDIsNil applies the IsNil predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDIsNil() predicate.Group {
+	return predicate.Group(sql.FieldIsNull(FieldMemberFallbackGroupID))
+}
+
+// MemberFallbackGroupIDNotNil applies the NotNil predicate on the "member_fallback_group_id" field.
+func MemberFallbackGroupIDNotNil() predicate.Group {
+	return predicate.Group(sql.FieldNotNull(FieldMemberFallbackGroupID))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

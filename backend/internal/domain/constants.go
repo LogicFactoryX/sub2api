@@ -40,7 +40,7 @@ const (
 	RedeemTypeBalance      = "balance"
 	RedeemTypeConcurrency  = "concurrency"
 	RedeemTypeSubscription = "subscription"
-	RedeemTypeGroup        = "group"
+	RedeemTypeMembership   = "membership"
 	RedeemTypeInvitation   = "invitation"
 )
 

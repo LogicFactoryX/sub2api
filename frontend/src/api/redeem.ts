@@ -20,6 +20,7 @@ export interface RedeemHistoryItem {
   group_id?: number
   fallback_group_id?: number
   validity_days?: number
+  membership_expires_at?: string
   group?: {
     id: number
     name: string
@@ -40,6 +41,7 @@ export async function redeem(code: string): Promise<{
   group_id?: number
   fallback_group_id?: number
   validity_days?: number
+  membership_expires_at?: string
   group?: { id: number; name: string }
 }> {
   const payload: RedeemCodeRequest = { code }
@@ -53,6 +55,7 @@ export async function redeem(code: string): Promise<{
     group_id?: number
     fallback_group_id?: number
     validity_days?: number
+    membership_expires_at?: string
     group?: { id: number; name: string }
   }>('/redeem', payload)
 

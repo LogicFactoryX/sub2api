@@ -130,7 +130,7 @@ try {
             $env:CGO_ENABLED = "0"
             $env:GOOS = "windows"
             $env:GOARCH = "amd64"
-            Invoke-Native $go build -tags embed -trimpath -ldflags $ldflags -o $exePath ./cmd/server
+            Invoke-Native $go build -tags "embed,timetzdata" -trimpath -ldflags $ldflags -o $exePath ./cmd/server
         }
         finally {
             $env:CGO_ENABLED = $oldCgo

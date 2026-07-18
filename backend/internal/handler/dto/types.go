@@ -87,15 +87,16 @@ type APIKey struct {
 }
 
 type Group struct {
-	ID             int64   `json:"id"`
-	Name           string  `json:"name"`
-	Description    string  `json:"description"`
-	Platform       string  `json:"platform"`
-	RateMultiplier float64 `json:"rate_multiplier"`
-	IsExclusive    bool    `json:"is_exclusive"`
-	ShowToAllUsers bool    `json:"show_to_all_users"`
-	Status         string  `json:"status"`
-	IsLocked       bool    `json:"is_locked,omitempty"`
+	ID                    int64   `json:"id"`
+	Name                  string  `json:"name"`
+	Description           string  `json:"description"`
+	Platform              string  `json:"platform"`
+	RateMultiplier        float64 `json:"rate_multiplier"`
+	IsExclusive           bool    `json:"is_exclusive"`
+	IsMemberGroup         bool    `json:"is_member_group"`
+	MemberFallbackGroupID *int64  `json:"member_fallback_group_id"`
+	Status                string  `json:"status"`
+	IsLocked              bool    `json:"is_locked,omitempty"`
 
 	SubscriptionType string   `json:"subscription_type"`
 	DailyLimitUSD    *float64 `json:"daily_limit_usd"`
@@ -384,9 +385,10 @@ type RedeemCode struct {
 	CreatedAt time.Time  `json:"created_at"`
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 
-	GroupID         *int64 `json:"group_id"`
-	FallbackGroupID *int64 `json:"fallback_group_id"`
-	ValidityDays    int    `json:"validity_days"`
+	GroupID             *int64     `json:"group_id"`
+	FallbackGroupID     *int64     `json:"fallback_group_id"`
+	ValidityDays        int        `json:"validity_days"`
+	MembershipExpiresAt *time.Time `json:"membership_expires_at,omitempty"`
 
 	// Notes is only populated for admin_balance/admin_concurrency types
 	// so users can see why they were charged or credited

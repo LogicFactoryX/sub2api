@@ -44,7 +44,8 @@ func (r *groupRepository) Create(ctx context.Context, groupIn *service.Group) er
 		SetRateMultiplier(groupIn.RateMultiplier).
 		SetSortOrder(groupIn.SortOrder).
 		SetIsExclusive(groupIn.IsExclusive).
-		SetShowToAllUsers(groupIn.ShowToAllUsers).
+		SetIsMemberGroup(groupIn.IsMemberGroup).
+		SetNillableMemberFallbackGroupID(groupIn.MemberFallbackGroupID).
 		SetStatus(groupIn.Status).
 		SetSubscriptionType(groupIn.SubscriptionType).
 		SetNillableDailyLimitUsd(groupIn.DailyLimitUSD).
@@ -136,7 +137,8 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetPlatform(groupIn.Platform).
 		SetRateMultiplier(groupIn.RateMultiplier).
 		SetIsExclusive(groupIn.IsExclusive).
-		SetShowToAllUsers(groupIn.ShowToAllUsers).
+		SetIsMemberGroup(groupIn.IsMemberGroup).
+		SetNillableMemberFallbackGroupID(groupIn.MemberFallbackGroupID).
 		SetStatus(groupIn.Status).
 		SetSubscriptionType(groupIn.SubscriptionType).
 		SetNillableDailyLimitUsd(groupIn.DailyLimitUSD).
@@ -187,6 +189,11 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		builder = builder.SetMonthlyLimitUsd(*groupIn.MonthlyLimitUSD)
 	} else {
 		builder = builder.ClearMonthlyLimitUsd()
+	}
+	if groupIn.MemberFallbackGroupID != nil {
+		builder = builder.SetMemberFallbackGroupID(*groupIn.MemberFallbackGroupID)
+	} else {
+		builder = builder.ClearMemberFallbackGroupID()
 	}
 	if groupIn.ImagePrice1K != nil {
 		builder = builder.SetImagePrice1k(*groupIn.ImagePrice1K)

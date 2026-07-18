@@ -41,8 +41,10 @@ type Group struct {
 	PeakRateMultiplier float64 `json:"peak_rate_multiplier,omitempty"`
 	// IsExclusive holds the value of the "is_exclusive" field.
 	IsExclusive bool `json:"is_exclusive,omitempty"`
-	// Allow locked users to preview this exclusive group in API key selectors
-	ShowToAllUsers bool `json:"show_to_all_users,omitempty"`
+	// IsMemberGroup holds the value of the "is_member_group" field.
+	IsMemberGroup bool `json:"is_member_group,omitempty"`
+	// MemberFallbackGroupID holds the value of the "member_fallback_group_id" field.
+	MemberFallbackGroupID *int64 `json:"member_fallback_group_id,omitempty"`
 	// Status holds the value of the "status" field.
 	Status string `json:"status,omitempty"`
 	// Platform holds the value of the "platform" field.
@@ -225,11 +227,11 @@ func (*Group) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case group.FieldModelRouting, group.FieldSupportedModelScopes, group.FieldMessagesDispatchModelConfig, group.FieldModelsListConfig:
 			values[i] = new([]byte)
-		case group.FieldPeakRateEnabled, group.FieldIsExclusive, group.FieldShowToAllUsers, group.FieldAllowImageGeneration, group.FieldAllowBatchImageGeneration, group.FieldImageRateIndependent, group.FieldVideoRateIndependent, group.FieldClaudeCodeOnly, group.FieldModelRoutingEnabled, group.FieldMcpXMLInject, group.FieldAllowMessagesDispatch, group.FieldRequireOauthOnly, group.FieldRequirePrivacySet:
+		case group.FieldPeakRateEnabled, group.FieldIsExclusive, group.FieldIsMemberGroup, group.FieldAllowImageGeneration, group.FieldAllowBatchImageGeneration, group.FieldImageRateIndependent, group.FieldVideoRateIndependent, group.FieldClaudeCodeOnly, group.FieldModelRoutingEnabled, group.FieldMcpXMLInject, group.FieldAllowMessagesDispatch, group.FieldRequireOauthOnly, group.FieldRequirePrivacySet:
 			values[i] = new(sql.NullBool)
 		case group.FieldRateMultiplier, group.FieldPeakRateMultiplier, group.FieldDailyLimitUsd, group.FieldWeeklyLimitUsd, group.FieldMonthlyLimitUsd, group.FieldImageRateMultiplier, group.FieldImagePrice1k, group.FieldImagePrice2k, group.FieldImagePrice4k, group.FieldBatchImageDiscountMultiplier, group.FieldBatchImageHoldMultiplier, group.FieldVideoRateMultiplier, group.FieldVideoPrice480p, group.FieldVideoPrice720p, group.FieldVideoPrice1080p, group.FieldWebSearchPricePerCall:
 			values[i] = new(sql.NullFloat64)
-		case group.FieldID, group.FieldDefaultValidityDays, group.FieldFallbackGroupID, group.FieldFallbackGroupIDOnInvalidRequest, group.FieldSortOrder, group.FieldRpmLimit:
+		case group.FieldID, group.FieldMemberFallbackGroupID, group.FieldDefaultValidityDays, group.FieldFallbackGroupID, group.FieldFallbackGroupIDOnInvalidRequest, group.FieldSortOrder, group.FieldRpmLimit:
 			values[i] = new(sql.NullInt64)
 		case group.FieldName, group.FieldDescription, group.FieldPeakStart, group.FieldPeakEnd, group.FieldStatus, group.FieldPlatform, group.FieldSubscriptionType, group.FieldDefaultMappedModel:
 			values[i] = new(sql.NullString)
@@ -324,11 +326,18 @@ func (_m *Group) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.IsExclusive = value.Bool
 			}
-		case group.FieldShowToAllUsers:
+		case group.FieldIsMemberGroup:
 			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field show_to_all_users", values[i])
+				return fmt.Errorf("unexpected type %T for field is_member_group", values[i])
 			} else if value.Valid {
-				_m.ShowToAllUsers = value.Bool
+				_m.IsMemberGroup = value.Bool
+			}
+		case group.FieldMemberFallbackGroupID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field member_fallback_group_id", values[i])
+			} else if value.Valid {
+				_m.MemberFallbackGroupID = new(int64)
+				*_m.MemberFallbackGroupID = value.Int64
 			}
 		case group.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -685,8 +694,13 @@ func (_m *Group) String() string {
 	builder.WriteString("is_exclusive=")
 	builder.WriteString(fmt.Sprintf("%v", _m.IsExclusive))
 	builder.WriteString(", ")
-	builder.WriteString("show_to_all_users=")
-	builder.WriteString(fmt.Sprintf("%v", _m.ShowToAllUsers))
+	builder.WriteString("is_member_group=")
+	builder.WriteString(fmt.Sprintf("%v", _m.IsMemberGroup))
+	builder.WriteString(", ")
+	if v := _m.MemberFallbackGroupID; v != nil {
+		builder.WriteString("member_fallback_group_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(_m.Status)

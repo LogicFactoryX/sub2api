@@ -255,10 +255,14 @@
             >
           </template>
 
-          <template #cell-is_exclusive="{ value }">
-            <span :class="['badge', value ? 'badge-primary' : 'badge-gray']">
+          <template #cell-is_exclusive="{ value, row }">
+            <span :class="['badge', value || row.is_member_group ? 'badge-primary' : 'badge-gray']">
               {{
-                value ? t("admin.groups.exclusive") : t("admin.groups.public")
+                value
+                  ? t("admin.groups.exclusive")
+                  : row.is_member_group
+                    ? t("admin.groups.memberGroup")
+                    : t("admin.groups.public")
               }}
             </span>
           </template>
@@ -629,7 +633,7 @@
           <div class="flex items-center gap-3">
             <button
               type="button"
-              @click="createForm.is_exclusive = !createForm.is_exclusive"
+              @click="toggleCreateExclusiveGroup"
               :class="[
                 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
                 createForm.is_exclusive
@@ -652,14 +656,18 @@
               }}
             </span>
           </div>
-          <div v-if="createForm.is_exclusive" class="mt-4 flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600">
+          <div v-if="createForm.subscription_type === 'standard'" class="mt-4 flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600">
             <div class="min-w-0 pr-4">
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('admin.groups.showToAllUsers') }}</p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.groups.showToAllUsersHint') }}</p>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('admin.groups.memberGroup') }}</p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.groups.memberGroupHint') }}</p>
             </div>
-            <button type="button" role="switch" :aria-checked="createForm.show_to_all_users" @click="createForm.show_to_all_users = !createForm.show_to_all_users" :class="['relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors', createForm.show_to_all_users ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600']">
-              <span :class="['inline-block h-4 w-4 rounded-full bg-white transition-transform', createForm.show_to_all_users ? 'translate-x-6' : 'translate-x-1']" />
+            <button type="button" role="switch" :aria-checked="createForm.is_member_group" @click="toggleCreateMemberGroup" :class="['relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors', createForm.is_member_group ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600']">
+              <span :class="['inline-block h-4 w-4 rounded-full bg-white transition-transform', createForm.is_member_group ? 'translate-x-6' : 'translate-x-1']" />
             </button>
+          </div>
+          <div v-if="createForm.is_member_group" class="mt-4">
+            <label class="input-label">{{ t('admin.groups.memberFallbackGroup') }}</label>
+            <Select v-model="createForm.member_fallback_group_id" :options="memberFallbackGroupOptions" />
           </div>
         </div>
 
@@ -2147,7 +2155,7 @@
           <div class="flex items-center gap-3">
             <button
               type="button"
-              @click="editForm.is_exclusive = !editForm.is_exclusive"
+              @click="toggleEditExclusiveGroup"
               :class="[
                 'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
                 editForm.is_exclusive
@@ -2170,14 +2178,18 @@
               }}
             </span>
           </div>
-          <div v-if="editForm.is_exclusive" class="mt-4 flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600">
+          <div v-if="editForm.subscription_type === 'standard'" class="mt-4 flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-dark-600">
             <div class="min-w-0 pr-4">
-              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('admin.groups.showToAllUsers') }}</p>
-              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.groups.showToAllUsersHint') }}</p>
+              <p class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ t('admin.groups.memberGroup') }}</p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">{{ t('admin.groups.memberGroupHint') }}</p>
             </div>
-            <button type="button" role="switch" :aria-checked="editForm.show_to_all_users" @click="editForm.show_to_all_users = !editForm.show_to_all_users" :class="['relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors', editForm.show_to_all_users ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600']">
-              <span :class="['inline-block h-4 w-4 rounded-full bg-white transition-transform', editForm.show_to_all_users ? 'translate-x-6' : 'translate-x-1']" />
+            <button type="button" role="switch" :aria-checked="editForm.is_member_group" @click="toggleEditMemberGroup" :class="['relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors', editForm.is_member_group ? 'bg-primary-500' : 'bg-gray-300 dark:bg-dark-600']">
+              <span :class="['inline-block h-4 w-4 rounded-full bg-white transition-transform', editForm.is_member_group ? 'translate-x-6' : 'translate-x-1']" />
             </button>
+          </div>
+          <div v-if="editForm.is_member_group" class="mt-4">
+            <label class="input-label">{{ t('admin.groups.memberFallbackGroup') }}</label>
+            <Select v-model="editForm.member_fallback_group_id" :options="memberFallbackGroupOptionsForEdit" />
           </div>
         </div>
         <div>
@@ -3872,6 +3884,33 @@ const fallbackGroupOptionsForEdit = computed(() => {
   return options;
 });
 
+const memberFallbackGroupOptions = computed(() =>
+  groups.value
+    .filter(
+      (g) =>
+        g.platform === createForm.platform &&
+        g.status === "active" &&
+        g.subscription_type === "standard" &&
+        !g.is_exclusive &&
+        !g.is_member_group,
+    )
+    .map((g) => ({ value: g.id, label: g.name })),
+);
+
+const memberFallbackGroupOptionsForEdit = computed(() =>
+  groups.value
+    .filter(
+      (g) =>
+        g.id !== editingGroup.value?.id &&
+        g.platform === editForm.platform &&
+        g.status === "active" &&
+        g.subscription_type === "standard" &&
+        !g.is_exclusive &&
+        !g.is_member_group,
+    )
+    .map((g) => ({ value: g.id, label: g.name })),
+);
+
 // 无效请求兜底分组选项（创建时）- 仅包含 anthropic 平台、非订阅且未配置兜底的分组
 const invalidRequestFallbackOptions = computed(() => {
   const options: { value: number | null; label: string }[] = [
@@ -4010,7 +4049,8 @@ const createForm = reactive({
   platform: "anthropic" as GroupPlatform,
   rate_multiplier: 1.0,
   is_exclusive: false,
-  show_to_all_users: false,
+  is_member_group: false,
+  member_fallback_group_id: null as number | null,
   subscription_type: "standard" as SubscriptionType,
   daily_limit_usd: null as number | null,
   weekly_limit_usd: null as number | null,
@@ -4357,7 +4397,8 @@ const editForm = reactive({
   platform: "anthropic" as GroupPlatform,
   rate_multiplier: 1.0,
   is_exclusive: false,
-  show_to_all_users: false,
+  is_member_group: false,
+  member_fallback_group_id: null as number | null,
   status: "active" as "active" | "inactive",
   subscription_type: "standard" as SubscriptionType,
   daily_limit_usd: null as number | null,
@@ -4411,6 +4452,34 @@ const editForm = reactive({
   // 分组级 RPM 限制（每用户每分钟最大请求数；0 = 不限制）
   rpm_limit: 0 as number,
 });
+
+const toggleCreateMemberGroup = () => {
+  createForm.is_member_group = !createForm.is_member_group;
+  if (createForm.is_member_group) createForm.is_exclusive = false;
+  if (!createForm.is_member_group) createForm.member_fallback_group_id = null;
+};
+
+const toggleCreateExclusiveGroup = () => {
+  createForm.is_exclusive = !createForm.is_exclusive;
+  if (createForm.is_exclusive) {
+    createForm.is_member_group = false;
+    createForm.member_fallback_group_id = null;
+  }
+};
+
+const toggleEditMemberGroup = () => {
+  editForm.is_member_group = !editForm.is_member_group;
+  if (editForm.is_member_group) editForm.is_exclusive = false;
+  if (!editForm.is_member_group) editForm.member_fallback_group_id = null;
+};
+
+const toggleEditExclusiveGroup = () => {
+  editForm.is_exclusive = !editForm.is_exclusive;
+  if (editForm.is_exclusive) {
+    editForm.is_member_group = false;
+    editForm.member_fallback_group_id = null;
+  }
+};
 
 type ImagePricingFormState = {
   platform: GroupPlatform;
@@ -4766,7 +4835,8 @@ const closeCreateModal = () => {
   createForm.platform = "anthropic";
   createForm.rate_multiplier = 1.0;
   createForm.is_exclusive = false;
-  createForm.show_to_all_users = false;
+  createForm.is_member_group = false;
+  createForm.member_fallback_group_id = null;
   createForm.subscription_type = "standard";
   createForm.daily_limit_usd = null;
   createForm.weekly_limit_usd = null;
@@ -4836,6 +4906,10 @@ const normalizeRateMultiplier = (
 const handleCreateGroup = async () => {
   if (!createForm.name.trim()) {
     appStore.showError(t("admin.groups.nameRequired"));
+    return;
+  }
+  if (createForm.is_member_group && !createForm.member_fallback_group_id) {
+    appStore.showError(t("admin.groups.memberFallbackRequired"));
     return;
   }
   submitting.value = true;
@@ -4932,7 +5006,8 @@ const handleEdit = async (group: AdminGroup) => {
   editForm.platform = group.platform;
   editForm.rate_multiplier = group.rate_multiplier;
   editForm.is_exclusive = group.is_exclusive;
-  editForm.show_to_all_users = group.show_to_all_users ?? false;
+  editForm.is_member_group = group.is_member_group ?? false;
+  editForm.member_fallback_group_id = group.member_fallback_group_id ?? null;
   editForm.status = group.status;
   editForm.subscription_type = group.subscription_type || "standard";
   editForm.daily_limit_usd = group.daily_limit_usd;
@@ -5023,6 +5098,10 @@ const handleUpdateGroup = async () => {
     appStore.showError(t("admin.groups.nameRequired"));
     return;
   }
+  if (editForm.is_member_group && !editForm.member_fallback_group_id) {
+    appStore.showError(t("admin.groups.memberFallbackRequired"));
+    return;
+  }
 
   submitting.value = true;
   try {
@@ -5040,6 +5119,8 @@ const handleUpdateGroup = async () => {
       ),
       fallback_group_id:
         editForm.fallback_group_id === null ? 0 : editForm.fallback_group_id,
+      member_fallback_group_id:
+        editForm.member_fallback_group_id === null ? 0 : editForm.member_fallback_group_id,
       fallback_group_id_on_invalid_request:
         editForm.fallback_group_id_on_invalid_request === null
           ? 0
@@ -5176,6 +5257,8 @@ watch(
   (newVal) => {
     if (newVal === "subscription") {
       createForm.is_exclusive = true;
+      createForm.is_member_group = false;
+      createForm.member_fallback_group_id = null;
       createForm.fallback_group_id_on_invalid_request = null;
     } else {
       createForm.peak_rate_enabled = false;
@@ -5202,6 +5285,7 @@ watch(
 watch(
   () => createForm.platform,
   (newVal) => {
+    createForm.member_fallback_group_id = null;
     if (!["anthropic", "antigravity"].includes(newVal)) {
       createForm.fallback_group_id_on_invalid_request = null;
     }
@@ -5235,6 +5319,9 @@ watch(
 watch(
   () => editForm.platform,
   (newVal) => {
+    if (!editingGroup.value || newVal !== editingGroup.value.platform) {
+      editForm.member_fallback_group_id = null;
+    }
     if (!["anthropic", "antigravity"].includes(newVal)) {
       editForm.fallback_group_id_on_invalid_request = null;
     }

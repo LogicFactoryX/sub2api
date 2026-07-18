@@ -129,6 +129,33 @@ func defaultAllowImageGenerationForPlatform(platform string) bool {
 	return platform == PlatformGrok
 }
 
+func (s *adminServiceImpl) validateMemberGroupConfig(ctx context.Context, group *Group) error {
+	if !group.IsMemberGroup {
+		group.MemberFallbackGroupID = nil
+		return nil
+	}
+	if group.IsExclusive {
+		return errors.New("member groups cannot be exclusive groups")
+	}
+	if group.IsSubscriptionType() {
+		return errors.New("subscription groups cannot be member groups")
+	}
+	if group.MemberFallbackGroupID == nil || *group.MemberFallbackGroupID <= 0 {
+		return errors.New("member_fallback_group_id is required for member groups")
+	}
+	if group.ID > 0 && *group.MemberFallbackGroupID == group.ID {
+		return errors.New("member fallback group must differ from the member group")
+	}
+	fallback, err := s.groupRepo.GetByID(ctx, *group.MemberFallbackGroupID)
+	if err != nil {
+		return fmt.Errorf("member fallback group not found: %w", err)
+	}
+	if !fallback.IsActive() || fallback.Platform != group.Platform || fallback.IsExclusive || fallback.IsMemberGroup || fallback.IsSubscriptionType() {
+		return errors.New("member fallback group must be an active public standard group on the same platform")
+	}
+	return nil
+}
+
 func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupInput) (*Group, error) {
 	if input.RateMultiplier <= 0 {
 		return nil, errors.New("rate_multiplier must be > 0")
@@ -265,7 +292,8 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		Platform:                        platform,
 		RateMultiplier:                  input.RateMultiplier,
 		IsExclusive:                     input.IsExclusive,
-		ShowToAllUsers:                  input.ShowToAllUsers && input.IsExclusive,
+		IsMemberGroup:                   input.IsMemberGroup,
+		MemberFallbackGroupID:           input.MemberFallbackGroupID,
 		Status:                          StatusActive,
 		SubscriptionType:                subscriptionType,
 		DailyLimitUSD:                   dailyLimit,
@@ -305,6 +333,9 @@ func (s *adminServiceImpl) CreateGroup(ctx context.Context, input *CreateGroupIn
 		RPMLimit:                        input.RPMLimit,
 	}
 	sanitizeGroupMessagesDispatchFields(group)
+	if err := s.validateMemberGroupConfig(ctx, group); err != nil {
+		return nil, err
+	}
 	if err := s.groupRepo.Create(ctx, group); err != nil {
 		return nil, err
 	}
@@ -450,11 +481,15 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	if input.IsExclusive != nil {
 		group.IsExclusive = *input.IsExclusive
 	}
-	if input.ShowToAllUsers != nil {
-		group.ShowToAllUsers = *input.ShowToAllUsers
+	if input.IsMemberGroup != nil {
+		group.IsMemberGroup = *input.IsMemberGroup
 	}
-	if !group.IsExclusive {
-		group.ShowToAllUsers = false
+	if input.MemberFallbackGroupID != nil {
+		if *input.MemberFallbackGroupID == 0 {
+			group.MemberFallbackGroupID = nil
+		} else {
+			group.MemberFallbackGroupID = input.MemberFallbackGroupID
+		}
 	}
 	if input.Status != "" {
 		group.Status = input.Status
@@ -627,6 +662,9 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	}
 	sanitizeGroupMessagesDispatchFields(group)
 
+	if err := s.validateMemberGroupConfig(ctx, group); err != nil {
+		return nil, err
+	}
 	if err := s.groupRepo.Update(ctx, group); err != nil {
 		return nil, err
 	}

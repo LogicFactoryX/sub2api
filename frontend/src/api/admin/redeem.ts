@@ -70,8 +70,7 @@ export async function generate(
   value: number,
   groupId?: number | null,
   validityDays?: number,
-  expiresInDays?: number | null,
-  fallbackGroupId?: number | null
+  expiresInDays?: number | null
 ): Promise<RedeemCode[]> {
   const payload: GenerateRedeemCodesRequest = {
     count,
@@ -80,14 +79,14 @@ export async function generate(
   }
 
   // 订阅类型专用字段
-  if (type === 'subscription' || type === 'group') {
+  if (type === 'subscription') {
     payload.group_id = groupId
     if (validityDays && validityDays > 0) {
       payload.validity_days = validityDays
     }
   }
-  if (type === 'group') {
-    payload.fallback_group_id = fallbackGroupId
+  if (type === 'membership' && validityDays && validityDays > 0) {
+    payload.validity_days = validityDays
   }
   if (expiresInDays && expiresInDays > 0) {
     payload.expires_in_days = expiresInDays

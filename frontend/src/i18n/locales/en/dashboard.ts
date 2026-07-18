@@ -590,7 +590,7 @@ export default {
     concurrencyReducedAdmin: 'Concurrency Reduced (Admin)',
     adminAdjustment: 'Admin Adjustment',
     subscriptionAssigned: 'Subscription Assigned',
-    groupAccessGranted: 'Group access granted',
+    membershipGranted: 'Membership activated or extended until',
     subscriptionAssignedDesc: 'You have been granted access to {groupName}',
     subscriptionDays: '{days} days',
     days: ' days',

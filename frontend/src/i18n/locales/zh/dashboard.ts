@@ -595,7 +595,7 @@ export default {
     concurrencyReducedAdmin: '并发减少（管理员）',
     adminAdjustment: '管理员调整',
     subscriptionAssigned: '订阅已分配',
-    groupAccessGranted: '已获得分组使用权限',
+    membershipGranted: '会员已开通或续期，有效期至',
     subscriptionAssignedDesc: '您已获得 {groupName} 的访问权限',
     subscriptionDays: '{days} 天',
     days: '天',

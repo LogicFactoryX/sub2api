@@ -21,14 +21,15 @@ type Group struct {
 	RateMultiplier float64
 	// 高峰时段倍率：peak_rate_enabled 为 true 且当前时刻处于 [PeakStart, PeakEnd) 时，
 	// token 计费倍率额外乘以 PeakRateMultiplier。详见 PeakMultiplierAt。
-	PeakRateEnabled    bool
-	PeakStart          string
-	PeakEnd            string
-	PeakRateMultiplier float64
-	IsExclusive        bool
-	ShowToAllUsers     bool
-	Status             string
-	Hydrated           bool // indicates the group was loaded from a trusted repository source
+	PeakRateEnabled       bool
+	PeakStart             string
+	PeakEnd               string
+	PeakRateMultiplier    float64
+	IsExclusive           bool
+	IsMemberGroup         bool
+	MemberFallbackGroupID *int64
+	Status                string
+	Hydrated              bool // indicates the group was loaded from a trusted repository source
 
 	SubscriptionType    string
 	DailyLimitUSD       *float64

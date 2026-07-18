@@ -85,7 +85,7 @@ func provideCleanup(
 	subscriptionExpiry *service.SubscriptionExpiryService,
 	usageCleanup *service.UsageCleanupService,
 	idempotencyCleanup *service.IdempotencyCleanupService,
-	groupEntitlementExpiry *service.GroupEntitlementExpiryService,
+	membershipExpiry *service.MembershipExpiryService,
 	batchImageCleanup *service.BatchImageCleanupService,
 	batchImageWorker *service.BatchImageWorkerRuntime,
 	pricing *service.PricingService,
@@ -170,9 +170,9 @@ func provideCleanup(
 				}
 				return nil
 			}},
-			{"GroupEntitlementExpiryService", func() error {
-				if groupEntitlementExpiry != nil {
-					groupEntitlementExpiry.Stop()
+			{"MembershipExpiryService", func() error {
+				if membershipExpiry != nil {
+					membershipExpiry.Stop()
 				}
 				return nil
 			}},

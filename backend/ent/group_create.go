@@ -175,16 +175,30 @@ func (_c *GroupCreate) SetNillableIsExclusive(v *bool) *GroupCreate {
 	return _c
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (_c *GroupCreate) SetShowToAllUsers(v bool) *GroupCreate {
-	_c.mutation.SetShowToAllUsers(v)
+// SetIsMemberGroup sets the "is_member_group" field.
+func (_c *GroupCreate) SetIsMemberGroup(v bool) *GroupCreate {
+	_c.mutation.SetIsMemberGroup(v)
 	return _c
 }
 
-// SetNillableShowToAllUsers sets the "show_to_all_users" field if the given value is not nil.
-func (_c *GroupCreate) SetNillableShowToAllUsers(v *bool) *GroupCreate {
+// SetNillableIsMemberGroup sets the "is_member_group" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableIsMemberGroup(v *bool) *GroupCreate {
 	if v != nil {
-		_c.SetShowToAllUsers(*v)
+		_c.SetIsMemberGroup(*v)
+	}
+	return _c
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (_c *GroupCreate) SetMemberFallbackGroupID(v int64) *GroupCreate {
+	_c.mutation.SetMemberFallbackGroupID(v)
+	return _c
+}
+
+// SetNillableMemberFallbackGroupID sets the "member_fallback_group_id" field if the given value is not nil.
+func (_c *GroupCreate) SetNillableMemberFallbackGroupID(v *int64) *GroupCreate {
+	if v != nil {
+		_c.SetMemberFallbackGroupID(*v)
 	}
 	return _c
 }
@@ -856,9 +870,9 @@ func (_c *GroupCreate) defaults() error {
 		v := group.DefaultIsExclusive
 		_c.mutation.SetIsExclusive(v)
 	}
-	if _, ok := _c.mutation.ShowToAllUsers(); !ok {
-		v := group.DefaultShowToAllUsers
-		_c.mutation.SetShowToAllUsers(v)
+	if _, ok := _c.mutation.IsMemberGroup(); !ok {
+		v := group.DefaultIsMemberGroup
+		_c.mutation.SetIsMemberGroup(v)
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := group.DefaultStatus
@@ -1003,8 +1017,8 @@ func (_c *GroupCreate) check() error {
 	if _, ok := _c.mutation.IsExclusive(); !ok {
 		return &ValidationError{Name: "is_exclusive", err: errors.New(`ent: missing required field "Group.is_exclusive"`)}
 	}
-	if _, ok := _c.mutation.ShowToAllUsers(); !ok {
-		return &ValidationError{Name: "show_to_all_users", err: errors.New(`ent: missing required field "Group.show_to_all_users"`)}
+	if _, ok := _c.mutation.IsMemberGroup(); !ok {
+		return &ValidationError{Name: "is_member_group", err: errors.New(`ent: missing required field "Group.is_member_group"`)}
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Group.status"`)}
@@ -1169,9 +1183,13 @@ func (_c *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		_spec.SetField(group.FieldIsExclusive, field.TypeBool, value)
 		_node.IsExclusive = value
 	}
-	if value, ok := _c.mutation.ShowToAllUsers(); ok {
-		_spec.SetField(group.FieldShowToAllUsers, field.TypeBool, value)
-		_node.ShowToAllUsers = value
+	if value, ok := _c.mutation.IsMemberGroup(); ok {
+		_spec.SetField(group.FieldIsMemberGroup, field.TypeBool, value)
+		_node.IsMemberGroup = value
+	}
+	if value, ok := _c.mutation.MemberFallbackGroupID(); ok {
+		_spec.SetField(group.FieldMemberFallbackGroupID, field.TypeInt64, value)
+		_node.MemberFallbackGroupID = &value
 	}
 	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(group.FieldStatus, field.TypeString, value)
@@ -1621,15 +1639,39 @@ func (u *GroupUpsert) UpdateIsExclusive() *GroupUpsert {
 	return u
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (u *GroupUpsert) SetShowToAllUsers(v bool) *GroupUpsert {
-	u.Set(group.FieldShowToAllUsers, v)
+// SetIsMemberGroup sets the "is_member_group" field.
+func (u *GroupUpsert) SetIsMemberGroup(v bool) *GroupUpsert {
+	u.Set(group.FieldIsMemberGroup, v)
 	return u
 }
 
-// UpdateShowToAllUsers sets the "show_to_all_users" field to the value that was provided on create.
-func (u *GroupUpsert) UpdateShowToAllUsers() *GroupUpsert {
-	u.SetExcluded(group.FieldShowToAllUsers)
+// UpdateIsMemberGroup sets the "is_member_group" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateIsMemberGroup() *GroupUpsert {
+	u.SetExcluded(group.FieldIsMemberGroup)
+	return u
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (u *GroupUpsert) SetMemberFallbackGroupID(v int64) *GroupUpsert {
+	u.Set(group.FieldMemberFallbackGroupID, v)
+	return u
+}
+
+// UpdateMemberFallbackGroupID sets the "member_fallback_group_id" field to the value that was provided on create.
+func (u *GroupUpsert) UpdateMemberFallbackGroupID() *GroupUpsert {
+	u.SetExcluded(group.FieldMemberFallbackGroupID)
+	return u
+}
+
+// AddMemberFallbackGroupID adds v to the "member_fallback_group_id" field.
+func (u *GroupUpsert) AddMemberFallbackGroupID(v int64) *GroupUpsert {
+	u.Add(group.FieldMemberFallbackGroupID, v)
+	return u
+}
+
+// ClearMemberFallbackGroupID clears the value of the "member_fallback_group_id" field.
+func (u *GroupUpsert) ClearMemberFallbackGroupID() *GroupUpsert {
+	u.SetNull(group.FieldMemberFallbackGroupID)
 	return u
 }
 
@@ -2482,17 +2524,45 @@ func (u *GroupUpsertOne) UpdateIsExclusive() *GroupUpsertOne {
 	})
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (u *GroupUpsertOne) SetShowToAllUsers(v bool) *GroupUpsertOne {
+// SetIsMemberGroup sets the "is_member_group" field.
+func (u *GroupUpsertOne) SetIsMemberGroup(v bool) *GroupUpsertOne {
 	return u.Update(func(s *GroupUpsert) {
-		s.SetShowToAllUsers(v)
+		s.SetIsMemberGroup(v)
 	})
 }
 
-// UpdateShowToAllUsers sets the "show_to_all_users" field to the value that was provided on create.
-func (u *GroupUpsertOne) UpdateShowToAllUsers() *GroupUpsertOne {
+// UpdateIsMemberGroup sets the "is_member_group" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateIsMemberGroup() *GroupUpsertOne {
 	return u.Update(func(s *GroupUpsert) {
-		s.UpdateShowToAllUsers()
+		s.UpdateIsMemberGroup()
+	})
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (u *GroupUpsertOne) SetMemberFallbackGroupID(v int64) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetMemberFallbackGroupID(v)
+	})
+}
+
+// AddMemberFallbackGroupID adds v to the "member_fallback_group_id" field.
+func (u *GroupUpsertOne) AddMemberFallbackGroupID(v int64) *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddMemberFallbackGroupID(v)
+	})
+}
+
+// UpdateMemberFallbackGroupID sets the "member_fallback_group_id" field to the value that was provided on create.
+func (u *GroupUpsertOne) UpdateMemberFallbackGroupID() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateMemberFallbackGroupID()
+	})
+}
+
+// ClearMemberFallbackGroupID clears the value of the "member_fallback_group_id" field.
+func (u *GroupUpsertOne) ClearMemberFallbackGroupID() *GroupUpsertOne {
+	return u.Update(func(s *GroupUpsert) {
+		s.ClearMemberFallbackGroupID()
 	})
 }
 
@@ -3617,17 +3687,45 @@ func (u *GroupUpsertBulk) UpdateIsExclusive() *GroupUpsertBulk {
 	})
 }
 
-// SetShowToAllUsers sets the "show_to_all_users" field.
-func (u *GroupUpsertBulk) SetShowToAllUsers(v bool) *GroupUpsertBulk {
+// SetIsMemberGroup sets the "is_member_group" field.
+func (u *GroupUpsertBulk) SetIsMemberGroup(v bool) *GroupUpsertBulk {
 	return u.Update(func(s *GroupUpsert) {
-		s.SetShowToAllUsers(v)
+		s.SetIsMemberGroup(v)
 	})
 }
 
-// UpdateShowToAllUsers sets the "show_to_all_users" field to the value that was provided on create.
-func (u *GroupUpsertBulk) UpdateShowToAllUsers() *GroupUpsertBulk {
+// UpdateIsMemberGroup sets the "is_member_group" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateIsMemberGroup() *GroupUpsertBulk {
 	return u.Update(func(s *GroupUpsert) {
-		s.UpdateShowToAllUsers()
+		s.UpdateIsMemberGroup()
+	})
+}
+
+// SetMemberFallbackGroupID sets the "member_fallback_group_id" field.
+func (u *GroupUpsertBulk) SetMemberFallbackGroupID(v int64) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.SetMemberFallbackGroupID(v)
+	})
+}
+
+// AddMemberFallbackGroupID adds v to the "member_fallback_group_id" field.
+func (u *GroupUpsertBulk) AddMemberFallbackGroupID(v int64) *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.AddMemberFallbackGroupID(v)
+	})
+}
+
+// UpdateMemberFallbackGroupID sets the "member_fallback_group_id" field to the value that was provided on create.
+func (u *GroupUpsertBulk) UpdateMemberFallbackGroupID() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.UpdateMemberFallbackGroupID()
+	})
+}
+
+// ClearMemberFallbackGroupID clears the value of the "member_fallback_group_id" field.
+func (u *GroupUpsertBulk) ClearMemberFallbackGroupID() *GroupUpsertBulk {
+	return u.Update(func(s *GroupUpsert) {
+		s.ClearMemberFallbackGroupID()
 	})
 }
 

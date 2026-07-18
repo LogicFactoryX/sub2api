@@ -481,10 +481,10 @@ func ProvideRedeemService(
 	entClient *dbent.Client,
 	authCacheInvalidator APIKeyAuthCacheInvalidator,
 	affiliateService *AffiliateService,
-	groupEntitlementRepo GroupEntitlementRepository,
+	membershipRepo MembershipRepository,
 ) *RedeemService {
 	svc := NewRedeemService(redeemRepo, userRepo, subscriptionService, cache, billingCacheService, entClient, authCacheInvalidator, affiliateService)
-	svc.SetGroupEntitlementRepository(groupEntitlementRepo)
+	svc.SetMembershipRepository(membershipRepo)
 	return svc
 }
 
@@ -625,12 +625,12 @@ func ProvideAPIKeyService(
 	cfg *config.Config,
 	billingCacheService *BillingCacheService,
 	concurrencyService *ConcurrencyService,
-	groupEntitlementRepo GroupEntitlementRepository,
+	membershipRepo MembershipRepository,
 ) *APIKeyService {
 	svc := NewAPIKeyService(apiKeyRepo, userRepo, groupRepo, userSubRepo, userGroupRateRepo, cache, cfg)
 	svc.SetRateLimitCacheInvalidator(billingCacheService)
 	svc.SetConcurrencyService(concurrencyService)
-	svc.SetGroupEntitlementRepository(groupEntitlementRepo)
+	svc.SetMembershipRepository(membershipRepo)
 	return svc
 }
 
@@ -725,7 +725,7 @@ var ProviderSet = wire.NewSet(
 	ProvideIdempotencyCoordinator,
 	ProvideSystemOperationLockService,
 	ProvideIdempotencyCleanupService,
-	ProvideGroupEntitlementExpiryService,
+	ProvideMembershipExpiryService,
 	ProvideScheduledTestService,
 	ProvideScheduledTestRunnerService,
 	NewGroupCapacityService,

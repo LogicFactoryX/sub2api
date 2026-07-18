@@ -511,7 +511,8 @@ export interface Group {
   rate_multiplier: number
   rpm_limit?: number // Group-level RPM cap (0 = unlimited); overrides user-level rpm_limit when set
   is_exclusive: boolean
-  show_to_all_users: boolean
+  is_member_group: boolean
+  member_fallback_group_id: number | null
   is_locked?: boolean
   status: 'active' | 'inactive'
   subscription_type: SubscriptionType
@@ -651,7 +652,8 @@ export interface CreateGroupRequest {
   platform?: GroupPlatform
   rate_multiplier?: number
   is_exclusive?: boolean
-  show_to_all_users?: boolean
+  is_member_group?: boolean
+  member_fallback_group_id?: number | null
   subscription_type?: SubscriptionType
   daily_limit_usd?: number | null
   weekly_limit_usd?: number | null
@@ -699,7 +701,8 @@ export interface UpdateGroupRequest {
   platform?: GroupPlatform
   rate_multiplier?: number
   is_exclusive?: boolean
-  show_to_all_users?: boolean
+  is_member_group?: boolean
+  member_fallback_group_id?: number | null
   status?: 'active' | 'inactive'
   subscription_type?: SubscriptionType
   daily_limit_usd?: number | null
@@ -1353,7 +1356,7 @@ export interface CodexSessionImportResult {
 
 // ==================== Usage & Redeem Types ====================
 
-export type RedeemCodeType = 'balance' | 'concurrency' | 'subscription' | 'group' | 'invitation'
+export type RedeemCodeType = 'balance' | 'concurrency' | 'subscription' | 'membership' | 'invitation'
 export type UsageRequestType = 'unknown' | 'sync' | 'stream' | 'ws_v2' | 'cyber'
 export type ImageSizeSource = 'output' | 'input' | 'default' | 'legacy'
 export type ImageSizeBreakdown = Record<string, number>
@@ -1489,6 +1492,7 @@ export interface RedeemCode {
   group_id?: number | null // 订阅类型专用
   fallback_group_id?: number | null // 分组卡到期迁移分组
   validity_days?: number // 订阅类型专用
+  membership_expires_at?: string | null
   user?: User
   group?: Group // 关联的分组
 }

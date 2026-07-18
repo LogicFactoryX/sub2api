@@ -35,7 +35,7 @@ func NewRedeemHandler(adminService service.AdminService, redeemService *service.
 // GenerateRedeemCodesRequest represents generate redeem codes request
 type GenerateRedeemCodesRequest struct {
 	Count           int        `json:"count" binding:"required,min=1,max=100"`
-	Type            string     `json:"type" binding:"required,oneof=balance concurrency subscription group invitation"`
+	Type            string     `json:"type" binding:"required,oneof=balance concurrency subscription membership invitation"`
 	Value           float64    `json:"value"`
 	GroupID         *int64     `json:"group_id"` // 订阅类型必填
 	FallbackGroupID *int64     `json:"fallback_group_id"`
