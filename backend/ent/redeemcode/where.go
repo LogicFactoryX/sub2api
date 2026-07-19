@@ -105,6 +105,11 @@ func GroupID(v int64) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldEQ(FieldGroupID, v))
 }
 
+// FallbackGroupID applies equality check predicate on the "fallback_group_id" field. It's identical to FallbackGroupIDEQ.
+func FallbackGroupID(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldFallbackGroupID, v))
+}
+
 // ValidityDays applies equality check predicate on the "validity_days" field. It's identical to ValidityDaysEQ.
 func ValidityDays(v int) predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldEQ(FieldValidityDays, v))
@@ -618,6 +623,56 @@ func GroupIDIsNil() predicate.RedeemCode {
 // GroupIDNotNil applies the NotNil predicate on the "group_id" field.
 func GroupIDNotNil() predicate.RedeemCode {
 	return predicate.RedeemCode(sql.FieldNotNull(FieldGroupID))
+}
+
+// FallbackGroupIDEQ applies the EQ predicate on the "fallback_group_id" field.
+func FallbackGroupIDEQ(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldEQ(FieldFallbackGroupID, v))
+}
+
+// FallbackGroupIDNEQ applies the NEQ predicate on the "fallback_group_id" field.
+func FallbackGroupIDNEQ(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNEQ(FieldFallbackGroupID, v))
+}
+
+// FallbackGroupIDIn applies the In predicate on the "fallback_group_id" field.
+func FallbackGroupIDIn(vs ...int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIn(FieldFallbackGroupID, vs...))
+}
+
+// FallbackGroupIDNotIn applies the NotIn predicate on the "fallback_group_id" field.
+func FallbackGroupIDNotIn(vs ...int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotIn(FieldFallbackGroupID, vs...))
+}
+
+// FallbackGroupIDGT applies the GT predicate on the "fallback_group_id" field.
+func FallbackGroupIDGT(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldGT(FieldFallbackGroupID, v))
+}
+
+// FallbackGroupIDGTE applies the GTE predicate on the "fallback_group_id" field.
+func FallbackGroupIDGTE(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldGTE(FieldFallbackGroupID, v))
+}
+
+// FallbackGroupIDLT applies the LT predicate on the "fallback_group_id" field.
+func FallbackGroupIDLT(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldLT(FieldFallbackGroupID, v))
+}
+
+// FallbackGroupIDLTE applies the LTE predicate on the "fallback_group_id" field.
+func FallbackGroupIDLTE(v int64) predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldLTE(FieldFallbackGroupID, v))
+}
+
+// FallbackGroupIDIsNil applies the IsNil predicate on the "fallback_group_id" field.
+func FallbackGroupIDIsNil() predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldIsNull(FieldFallbackGroupID))
+}
+
+// FallbackGroupIDNotNil applies the NotNil predicate on the "fallback_group_id" field.
+func FallbackGroupIDNotNil() predicate.RedeemCode {
+	return predicate.RedeemCode(sql.FieldNotNull(FieldFallbackGroupID))
 }
 
 // ValidityDaysEQ applies the EQ predicate on the "validity_days" field.

@@ -156,6 +156,20 @@ func (_c *RedeemCodeCreate) SetNillableGroupID(v *int64) *RedeemCodeCreate {
 	return _c
 }
 
+// SetFallbackGroupID sets the "fallback_group_id" field.
+func (_c *RedeemCodeCreate) SetFallbackGroupID(v int64) *RedeemCodeCreate {
+	_c.mutation.SetFallbackGroupID(v)
+	return _c
+}
+
+// SetNillableFallbackGroupID sets the "fallback_group_id" field if the given value is not nil.
+func (_c *RedeemCodeCreate) SetNillableFallbackGroupID(v *int64) *RedeemCodeCreate {
+	if v != nil {
+		_c.SetFallbackGroupID(*v)
+	}
+	return _c
+}
+
 // SetValidityDays sets the "validity_days" field.
 func (_c *RedeemCodeCreate) SetValidityDays(v int) *RedeemCodeCreate {
 	_c.mutation.SetValidityDays(v)
@@ -344,6 +358,10 @@ func (_c *RedeemCodeCreate) createSpec() (*RedeemCode, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ExpiresAt(); ok {
 		_spec.SetField(redeemcode.FieldExpiresAt, field.TypeTime, value)
 		_node.ExpiresAt = &value
+	}
+	if value, ok := _c.mutation.FallbackGroupID(); ok {
+		_spec.SetField(redeemcode.FieldFallbackGroupID, field.TypeInt64, value)
+		_node.FallbackGroupID = &value
 	}
 	if value, ok := _c.mutation.ValidityDays(); ok {
 		_spec.SetField(redeemcode.FieldValidityDays, field.TypeInt, value)
@@ -579,6 +597,30 @@ func (u *RedeemCodeUpsert) ClearGroupID() *RedeemCodeUpsert {
 	return u
 }
 
+// SetFallbackGroupID sets the "fallback_group_id" field.
+func (u *RedeemCodeUpsert) SetFallbackGroupID(v int64) *RedeemCodeUpsert {
+	u.Set(redeemcode.FieldFallbackGroupID, v)
+	return u
+}
+
+// UpdateFallbackGroupID sets the "fallback_group_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsert) UpdateFallbackGroupID() *RedeemCodeUpsert {
+	u.SetExcluded(redeemcode.FieldFallbackGroupID)
+	return u
+}
+
+// AddFallbackGroupID adds v to the "fallback_group_id" field.
+func (u *RedeemCodeUpsert) AddFallbackGroupID(v int64) *RedeemCodeUpsert {
+	u.Add(redeemcode.FieldFallbackGroupID, v)
+	return u
+}
+
+// ClearFallbackGroupID clears the value of the "fallback_group_id" field.
+func (u *RedeemCodeUpsert) ClearFallbackGroupID() *RedeemCodeUpsert {
+	u.SetNull(redeemcode.FieldFallbackGroupID)
+	return u
+}
+
 // SetValidityDays sets the "validity_days" field.
 func (u *RedeemCodeUpsert) SetValidityDays(v int) *RedeemCodeUpsert {
 	u.Set(redeemcode.FieldValidityDays, v)
@@ -807,6 +849,34 @@ func (u *RedeemCodeUpsertOne) UpdateGroupID() *RedeemCodeUpsertOne {
 func (u *RedeemCodeUpsertOne) ClearGroupID() *RedeemCodeUpsertOne {
 	return u.Update(func(s *RedeemCodeUpsert) {
 		s.ClearGroupID()
+	})
+}
+
+// SetFallbackGroupID sets the "fallback_group_id" field.
+func (u *RedeemCodeUpsertOne) SetFallbackGroupID(v int64) *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetFallbackGroupID(v)
+	})
+}
+
+// AddFallbackGroupID adds v to the "fallback_group_id" field.
+func (u *RedeemCodeUpsertOne) AddFallbackGroupID(v int64) *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.AddFallbackGroupID(v)
+	})
+}
+
+// UpdateFallbackGroupID sets the "fallback_group_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsertOne) UpdateFallbackGroupID() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateFallbackGroupID()
+	})
+}
+
+// ClearFallbackGroupID clears the value of the "fallback_group_id" field.
+func (u *RedeemCodeUpsertOne) ClearFallbackGroupID() *RedeemCodeUpsertOne {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.ClearFallbackGroupID()
 	})
 }
 
@@ -1207,6 +1277,34 @@ func (u *RedeemCodeUpsertBulk) UpdateGroupID() *RedeemCodeUpsertBulk {
 func (u *RedeemCodeUpsertBulk) ClearGroupID() *RedeemCodeUpsertBulk {
 	return u.Update(func(s *RedeemCodeUpsert) {
 		s.ClearGroupID()
+	})
+}
+
+// SetFallbackGroupID sets the "fallback_group_id" field.
+func (u *RedeemCodeUpsertBulk) SetFallbackGroupID(v int64) *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.SetFallbackGroupID(v)
+	})
+}
+
+// AddFallbackGroupID adds v to the "fallback_group_id" field.
+func (u *RedeemCodeUpsertBulk) AddFallbackGroupID(v int64) *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.AddFallbackGroupID(v)
+	})
+}
+
+// UpdateFallbackGroupID sets the "fallback_group_id" field to the value that was provided on create.
+func (u *RedeemCodeUpsertBulk) UpdateFallbackGroupID() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.UpdateFallbackGroupID()
+	})
+}
+
+// ClearFallbackGroupID clears the value of the "fallback_group_id" field.
+func (u *RedeemCodeUpsertBulk) ClearFallbackGroupID() *RedeemCodeUpsertBulk {
+	return u.Update(func(s *RedeemCodeUpsert) {
+		s.ClearFallbackGroupID()
 	})
 }
 
