@@ -193,33 +193,6 @@ func (_u *RedeemCodeUpdate) ClearGroupID() *RedeemCodeUpdate {
 	return _u
 }
 
-// SetFallbackGroupID sets the "fallback_group_id" field.
-func (_u *RedeemCodeUpdate) SetFallbackGroupID(v int64) *RedeemCodeUpdate {
-	_u.mutation.ResetFallbackGroupID()
-	_u.mutation.SetFallbackGroupID(v)
-	return _u
-}
-
-// SetNillableFallbackGroupID sets the "fallback_group_id" field if the given value is not nil.
-func (_u *RedeemCodeUpdate) SetNillableFallbackGroupID(v *int64) *RedeemCodeUpdate {
-	if v != nil {
-		_u.SetFallbackGroupID(*v)
-	}
-	return _u
-}
-
-// AddFallbackGroupID adds value to the "fallback_group_id" field.
-func (_u *RedeemCodeUpdate) AddFallbackGroupID(v int64) *RedeemCodeUpdate {
-	_u.mutation.AddFallbackGroupID(v)
-	return _u
-}
-
-// ClearFallbackGroupID clears the value of the "fallback_group_id" field.
-func (_u *RedeemCodeUpdate) ClearFallbackGroupID() *RedeemCodeUpdate {
-	_u.mutation.ClearFallbackGroupID()
-	return _u
-}
-
 // SetValidityDays sets the "validity_days" field.
 func (_u *RedeemCodeUpdate) SetValidityDays(v int) *RedeemCodeUpdate {
 	_u.mutation.ResetValidityDays()
@@ -373,15 +346,6 @@ func (_u *RedeemCodeUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if _u.mutation.ExpiresAtCleared() {
 		_spec.ClearField(redeemcode.FieldExpiresAt, field.TypeTime)
-	}
-	if value, ok := _u.mutation.FallbackGroupID(); ok {
-		_spec.SetField(redeemcode.FieldFallbackGroupID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedFallbackGroupID(); ok {
-		_spec.AddField(redeemcode.FieldFallbackGroupID, field.TypeInt64, value)
-	}
-	if _u.mutation.FallbackGroupIDCleared() {
-		_spec.ClearField(redeemcode.FieldFallbackGroupID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.ValidityDays(); ok {
 		_spec.SetField(redeemcode.FieldValidityDays, field.TypeInt, value)
@@ -630,33 +594,6 @@ func (_u *RedeemCodeUpdateOne) ClearGroupID() *RedeemCodeUpdateOne {
 	return _u
 }
 
-// SetFallbackGroupID sets the "fallback_group_id" field.
-func (_u *RedeemCodeUpdateOne) SetFallbackGroupID(v int64) *RedeemCodeUpdateOne {
-	_u.mutation.ResetFallbackGroupID()
-	_u.mutation.SetFallbackGroupID(v)
-	return _u
-}
-
-// SetNillableFallbackGroupID sets the "fallback_group_id" field if the given value is not nil.
-func (_u *RedeemCodeUpdateOne) SetNillableFallbackGroupID(v *int64) *RedeemCodeUpdateOne {
-	if v != nil {
-		_u.SetFallbackGroupID(*v)
-	}
-	return _u
-}
-
-// AddFallbackGroupID adds value to the "fallback_group_id" field.
-func (_u *RedeemCodeUpdateOne) AddFallbackGroupID(v int64) *RedeemCodeUpdateOne {
-	_u.mutation.AddFallbackGroupID(v)
-	return _u
-}
-
-// ClearFallbackGroupID clears the value of the "fallback_group_id" field.
-func (_u *RedeemCodeUpdateOne) ClearFallbackGroupID() *RedeemCodeUpdateOne {
-	_u.mutation.ClearFallbackGroupID()
-	return _u
-}
-
 // SetValidityDays sets the "validity_days" field.
 func (_u *RedeemCodeUpdateOne) SetValidityDays(v int) *RedeemCodeUpdateOne {
 	_u.mutation.ResetValidityDays()
@@ -840,15 +777,6 @@ func (_u *RedeemCodeUpdateOne) sqlSave(ctx context.Context) (_node *RedeemCode, 
 	}
 	if _u.mutation.ExpiresAtCleared() {
 		_spec.ClearField(redeemcode.FieldExpiresAt, field.TypeTime)
-	}
-	if value, ok := _u.mutation.FallbackGroupID(); ok {
-		_spec.SetField(redeemcode.FieldFallbackGroupID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedFallbackGroupID(); ok {
-		_spec.AddField(redeemcode.FieldFallbackGroupID, field.TypeInt64, value)
-	}
-	if _u.mutation.FallbackGroupIDCleared() {
-		_spec.ClearField(redeemcode.FieldFallbackGroupID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.ValidityDays(); ok {
 		_spec.SetField(redeemcode.FieldValidityDays, field.TypeInt, value)

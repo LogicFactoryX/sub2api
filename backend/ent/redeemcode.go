@@ -39,8 +39,6 @@ type RedeemCode struct {
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 	// GroupID holds the value of the "group_id" field.
 	GroupID *int64 `json:"group_id,omitempty"`
-	// FallbackGroupID holds the value of the "fallback_group_id" field.
-	FallbackGroupID *int64 `json:"fallback_group_id,omitempty"`
 	// ValidityDays holds the value of the "validity_days" field.
 	ValidityDays int `json:"validity_days,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -89,7 +87,7 @@ func (*RedeemCode) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case redeemcode.FieldValue:
 			values[i] = new(sql.NullFloat64)
-		case redeemcode.FieldID, redeemcode.FieldUsedBy, redeemcode.FieldGroupID, redeemcode.FieldFallbackGroupID, redeemcode.FieldValidityDays:
+		case redeemcode.FieldID, redeemcode.FieldUsedBy, redeemcode.FieldGroupID, redeemcode.FieldValidityDays:
 			values[i] = new(sql.NullInt64)
 		case redeemcode.FieldCode, redeemcode.FieldType, redeemcode.FieldStatus, redeemcode.FieldNotes:
 			values[i] = new(sql.NullString)
@@ -181,13 +179,6 @@ func (_m *RedeemCode) assignValues(columns []string, values []any) error {
 				_m.GroupID = new(int64)
 				*_m.GroupID = value.Int64
 			}
-		case redeemcode.FieldFallbackGroupID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field fallback_group_id", values[i])
-			} else if value.Valid {
-				_m.FallbackGroupID = new(int64)
-				*_m.FallbackGroupID = value.Int64
-			}
 		case redeemcode.FieldValidityDays:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field validity_days", values[i])
@@ -277,11 +268,6 @@ func (_m *RedeemCode) String() string {
 	builder.WriteString(", ")
 	if v := _m.GroupID; v != nil {
 		builder.WriteString("group_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := _m.FallbackGroupID; v != nil {
-		builder.WriteString("fallback_group_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

@@ -45,7 +45,6 @@ import (
 	"github.com/Wei-Shaw/sub2api/ent/userallowedgroup"
 	"github.com/Wei-Shaw/sub2api/ent/userattributedefinition"
 	"github.com/Wei-Shaw/sub2api/ent/userattributevalue"
-	"github.com/Wei-Shaw/sub2api/ent/usergroupentitlement"
 	"github.com/Wei-Shaw/sub2api/ent/userplatformquota"
 	"github.com/Wei-Shaw/sub2api/ent/usersubscription"
 )
@@ -1078,33 +1077,6 @@ func (f TraverseUserAttributeValue) Traverse(ctx context.Context, q ent.Query) e
 	return fmt.Errorf("unexpected query type %T. expect *ent.UserAttributeValueQuery", q)
 }
 
-// The UserGroupEntitlementFunc type is an adapter to allow the use of ordinary function as a Querier.
-type UserGroupEntitlementFunc func(context.Context, *ent.UserGroupEntitlementQuery) (ent.Value, error)
-
-// Query calls f(ctx, q).
-func (f UserGroupEntitlementFunc) Query(ctx context.Context, q ent.Query) (ent.Value, error) {
-	if q, ok := q.(*ent.UserGroupEntitlementQuery); ok {
-		return f(ctx, q)
-	}
-	return nil, fmt.Errorf("unexpected query type %T. expect *ent.UserGroupEntitlementQuery", q)
-}
-
-// The TraverseUserGroupEntitlement type is an adapter to allow the use of ordinary function as Traverser.
-type TraverseUserGroupEntitlement func(context.Context, *ent.UserGroupEntitlementQuery) error
-
-// Intercept is a dummy implementation of Intercept that returns the next Querier in the pipeline.
-func (f TraverseUserGroupEntitlement) Intercept(next ent.Querier) ent.Querier {
-	return next
-}
-
-// Traverse calls f(ctx, q).
-func (f TraverseUserGroupEntitlement) Traverse(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.UserGroupEntitlementQuery); ok {
-		return f(ctx, q)
-	}
-	return fmt.Errorf("unexpected query type %T. expect *ent.UserGroupEntitlementQuery", q)
-}
-
 // The UserPlatformQuotaFunc type is an adapter to allow the use of ordinary function as a Querier.
 type UserPlatformQuotaFunc func(context.Context, *ent.UserPlatformQuotaQuery) (ent.Value, error)
 
@@ -1234,8 +1206,6 @@ func NewQuery(q ent.Query) (Query, error) {
 		return &query[*ent.UserAttributeDefinitionQuery, predicate.UserAttributeDefinition, userattributedefinition.OrderOption]{typ: ent.TypeUserAttributeDefinition, tq: q}, nil
 	case *ent.UserAttributeValueQuery:
 		return &query[*ent.UserAttributeValueQuery, predicate.UserAttributeValue, userattributevalue.OrderOption]{typ: ent.TypeUserAttributeValue, tq: q}, nil
-	case *ent.UserGroupEntitlementQuery:
-		return &query[*ent.UserGroupEntitlementQuery, predicate.UserGroupEntitlement, usergroupentitlement.OrderOption]{typ: ent.TypeUserGroupEntitlement, tq: q}, nil
 	case *ent.UserPlatformQuotaQuery:
 		return &query[*ent.UserPlatformQuotaQuery, predicate.UserPlatformQuota, userplatformquota.OrderOption]{typ: ent.TypeUserPlatformQuota, tq: q}, nil
 	case *ent.UserSubscriptionQuery:

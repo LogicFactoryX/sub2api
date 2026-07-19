@@ -847,6 +847,7 @@ var (
 		{Name: "is_member_group", Type: field.TypeBool, Default: false},
 		{Name: "member_fallback_group_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "status", Type: field.TypeString, Size: 20, Default: "active"},
+		{Name: "duplicate_operation_id", Type: field.TypeString, Nullable: true, Size: 64},
 		{Name: "platform", Type: field.TypeString, Size: 50, Default: "anthropic"},
 		{Name: "subscription_type", Type: field.TypeString, Size: 20, Default: "standard"},
 		{Name: "daily_limit_usd", Type: field.TypeFloat64, Nullable: true, SchemaType: map[string]string{"postgres": "decimal(20,8)"}},
@@ -898,12 +899,12 @@ var (
 			{
 				Name:    "group_platform",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[15]},
+				Columns: []*schema.Column{GroupsColumns[16]},
 			},
 			{
 				Name:    "group_subscription_type",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[16]},
+				Columns: []*schema.Column{GroupsColumns[17]},
 			},
 			{
 				Name:    "group_is_exclusive",
@@ -923,7 +924,15 @@ var (
 			{
 				Name:    "group_sort_order",
 				Unique:  false,
-				Columns: []*schema.Column{GroupsColumns[43]},
+				Columns: []*schema.Column{GroupsColumns[44]},
+			},
+			{
+				Name:    "idx_groups_duplicate_operation_id_active",
+				Unique:  true,
+				Columns: []*schema.Column{GroupsColumns[15]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "duplicate_operation_id IS NOT NULL AND deleted_at IS NULL",
+				},
 			},
 		},
 	}
@@ -1373,7 +1382,6 @@ var (
 		{Name: "notes", Type: field.TypeString, Nullable: true, SchemaType: map[string]string{"postgres": "text"}},
 		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamptz"}},
 		{Name: "expires_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "fallback_group_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "validity_days", Type: field.TypeInt, Default: 30},
 		{Name: "group_id", Type: field.TypeInt64, Nullable: true},
 		{Name: "used_by", Type: field.TypeInt64, Nullable: true},
@@ -1386,13 +1394,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "redeem_codes_groups_redeem_codes",
-				Columns:    []*schema.Column{RedeemCodesColumns[11]},
+				Columns:    []*schema.Column{RedeemCodesColumns[10]},
 				RefColumns: []*schema.Column{GroupsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "redeem_codes_users_redeem_codes",
-				Columns:    []*schema.Column{RedeemCodesColumns[12]},
+				Columns:    []*schema.Column{RedeemCodesColumns[11]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -1406,17 +1414,12 @@ var (
 			{
 				Name:    "redeemcode_used_by",
 				Unique:  false,
-				Columns: []*schema.Column{RedeemCodesColumns[12]},
+				Columns: []*schema.Column{RedeemCodesColumns[11]},
 			},
 			{
 				Name:    "redeemcode_group_id",
 				Unique:  false,
-				Columns: []*schema.Column{RedeemCodesColumns[11]},
-			},
-			{
-				Name:    "redeemcode_fallback_group_id",
-				Unique:  false,
-				Columns: []*schema.Column{RedeemCodesColumns[9]},
+				Columns: []*schema.Column{RedeemCodesColumns[10]},
 			},
 			{
 				Name:    "redeemcode_expires_at",
@@ -1864,38 +1867,6 @@ var (
 			},
 		},
 	}
-	// UserGroupEntitlementsColumns holds the columns for the "user_group_entitlements" table.
-	UserGroupEntitlementsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "user_id", Type: field.TypeInt64},
-		{Name: "group_id", Type: field.TypeInt64},
-		{Name: "fallback_group_id", Type: field.TypeInt64},
-		{Name: "redeem_code_id", Type: field.TypeInt64, Unique: true, Nullable: true},
-		{Name: "starts_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "expires_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "status", Type: field.TypeString, Size: 20, Default: "active"},
-		{Name: "expired_at", Type: field.TypeTime, Nullable: true, SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "created_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamptz"}},
-		{Name: "updated_at", Type: field.TypeTime, SchemaType: map[string]string{"postgres": "timestamptz"}},
-	}
-	// UserGroupEntitlementsTable holds the schema information for the "user_group_entitlements" table.
-	UserGroupEntitlementsTable = &schema.Table{
-		Name:       "user_group_entitlements",
-		Columns:    UserGroupEntitlementsColumns,
-		PrimaryKey: []*schema.Column{UserGroupEntitlementsColumns[0]},
-		Indexes: []*schema.Index{
-			{
-				Name:    "usergroupentitlement_user_id_group_id_expires_at",
-				Unique:  false,
-				Columns: []*schema.Column{UserGroupEntitlementsColumns[1], UserGroupEntitlementsColumns[2], UserGroupEntitlementsColumns[6]},
-			},
-			{
-				Name:    "usergroupentitlement_status_expires_at",
-				Unique:  false,
-				Columns: []*schema.Column{UserGroupEntitlementsColumns[7], UserGroupEntitlementsColumns[6]},
-			},
-		},
-	}
 	// UserPlatformQuotasColumns holds the columns for the "user_platform_quotas" table.
 	UserPlatformQuotasColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
@@ -2070,7 +2041,6 @@ var (
 		UserAllowedGroupsTable,
 		UserAttributeDefinitionsTable,
 		UserAttributeValuesTable,
-		UserGroupEntitlementsTable,
 		UserPlatformQuotasTable,
 		UserSubscriptionsTable,
 	}
@@ -2215,9 +2185,6 @@ func init() {
 	UserAttributeValuesTable.ForeignKeys[1].RefTable = UserAttributeDefinitionsTable
 	UserAttributeValuesTable.Annotation = &entsql.Annotation{
 		Table: "user_attribute_values",
-	}
-	UserGroupEntitlementsTable.Annotation = &entsql.Annotation{
-		Table: "user_group_entitlements",
 	}
 	UserPlatformQuotasTable.ForeignKeys[0].RefTable = UsersTable
 	UserPlatformQuotasTable.Annotation = &entsql.Annotation{
