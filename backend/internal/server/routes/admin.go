@@ -36,6 +36,8 @@ func RegisterAdminRoutes(
 		// 分组管理
 		registerGroupRoutes(admin, h)
 
+		registerModelPlazaRoutes(admin, h)
+
 		// 账号管理
 		registerAccountRoutes(admin, h, stepUpAuth)
 
@@ -116,6 +118,16 @@ func RegisterAdminRoutes(
 
 		// 操作审计日志
 		registerAuditLogRoutes(admin, h, stepUpAuth)
+	}
+}
+
+func registerModelPlazaRoutes(admin *gin.RouterGroup, h *handler.Handlers) {
+	modelPlaza := admin.Group("/model-plaza")
+	{
+		modelPlaza.GET("", h.Admin.ModelPlaza.List)
+		modelPlaza.POST("", h.Admin.ModelPlaza.Create)
+		modelPlaza.PUT("/:id", h.Admin.ModelPlaza.Update)
+		modelPlaza.DELETE("/:id", h.Admin.ModelPlaza.Delete)
 	}
 }
 

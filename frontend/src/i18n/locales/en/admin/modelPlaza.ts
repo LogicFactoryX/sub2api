@@ -1,0 +1,31 @@
+export default {
+  modelPlaza: {
+    title: 'Model Plaza',
+    description: 'Choose models and groups to control what users see in the model plaza.',
+    create: 'Add Model',
+    edit: 'Edit Model',
+    model: 'Model',
+    displayName: 'Display name',
+    displayNamePlaceholder: 'Uses the model ID when empty',
+    group: 'Group',
+    descriptionLabel: 'Description',
+    descriptionPlaceholder: 'Summarize the model capabilities and use cases',
+    tags: 'Tags',
+    tagsPlaceholder: 'Separate tags with commas',
+    sortOrder: 'Sort order',
+    enabled: 'Visible',
+    pricing: 'Effective price',
+    actions: 'Actions',
+    formula: 'Effective price = provider price × group rate ÷ 5',
+    selectGroupFirst: 'Select a group first',
+    selectModel: 'Select a model',
+    noEntries: 'No models have been added to the plaza',
+    deleteConfirm: 'Remove “{name}” from the model plaza?',
+    createSuccess: 'Model added to the plaza',
+    updateSuccess: 'Model plaza entry updated',
+    deleteSuccess: 'Model removed from the plaza',
+    loadFailed: 'Failed to load model plaza settings',
+    modelLoadFailed: 'Failed to load model catalog',
+    saveFailed: 'Failed to save model plaza entry'
+  }
+}

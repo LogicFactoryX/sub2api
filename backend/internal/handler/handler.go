@@ -10,6 +10,7 @@ type AdminHandlers struct {
 	Dashboard              *admin.DashboardHandler
 	User                   *admin.UserHandler
 	Group                  *admin.GroupHandler
+	ModelPlaza             *admin.ModelPlazaHandler
 	Account                *admin.AccountHandler
 	Announcement           *admin.AnnouncementHandler
 	DataManagement         *admin.DataManagementHandler
@@ -61,6 +62,7 @@ type Handlers struct {
 	Payment          *PaymentHandler
 	PaymentWebhook   *PaymentWebhookHandler
 	AvailableChannel *AvailableChannelHandler
+	ModelPlaza       *ModelPlazaHandler
 	AsyncImage       *AsyncImageHandler
 	BatchImage       *BatchImageHandler
 }

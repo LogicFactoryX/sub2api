@@ -1,0 +1,31 @@
+export default {
+  modelPlaza: {
+    title: '模型广场管理',
+    description: '选择模型和分组，配置用户模型广场的展示内容。',
+    create: '添加模型',
+    edit: '编辑模型',
+    model: '模型',
+    displayName: '展示名称',
+    displayNamePlaceholder: '留空时显示模型 ID',
+    group: '分组',
+    descriptionLabel: '模型简介',
+    descriptionPlaceholder: '简要介绍模型用途与特点',
+    tags: '标签',
+    tagsPlaceholder: '多个标签使用英文逗号分隔',
+    sortOrder: '排序',
+    enabled: '显示',
+    pricing: '实际价格',
+    actions: '操作',
+    formula: '实际价格 = 原厂价格 × 分组倍率 ÷ 5',
+    selectGroupFirst: '请先选择分组',
+    selectModel: '请选择模型',
+    noEntries: '模型广场尚未配置模型',
+    deleteConfirm: '确定从模型广场移除“{name}”吗？',
+    createSuccess: '模型已添加到广场',
+    updateSuccess: '模型广场配置已更新',
+    deleteSuccess: '模型已从广场移除',
+    loadFailed: '模型广场配置加载失败',
+    modelLoadFailed: '模型目录加载失败',
+    saveFailed: '模型广场配置保存失败'
+  }
+}

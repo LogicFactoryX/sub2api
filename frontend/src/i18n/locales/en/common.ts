@@ -163,6 +163,8 @@ export default {
     groups: 'Groups',
     channels: 'Channels',
     availableChannels: 'Available Channels',
+    modelPlaza: 'Model Plaza',
+    modelPlazaManagement: 'Model Plaza',
     subscriptions: 'Subscriptions',
     accounts: 'Accounts',
     proxies: 'Proxies',
