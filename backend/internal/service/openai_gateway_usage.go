@@ -174,12 +174,6 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	if input.BillingModelSource == BillingModelSourceRequested && input.OriginalModel != "" {
 		billingModel = input.OriginalModel
 	}
-	// The account mapping target is the final model executed upstream. It takes
-	// precedence over earlier channel aliases when choosing the user-facing
-	// price and usage-record model.
-	if forwardedModel := openAIForwardedUsageModel(result); forwardedModel != result.Model {
-		billingModel = forwardedModel
-	}
 	billingModels := usageBillingModelCandidates(
 		billingModel,
 		result.BillingModel,
@@ -251,16 +245,15 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	if input.OriginalModel != "" {
 		requestedModel = input.OriginalModel
 	}
-	displayModel := openAIForwardedUsageModel(result)
 
 	usageLog := &UsageLog{
 		UserID:              user.ID,
 		APIKeyID:            apiKey.ID,
 		AccountID:           account.ID,
 		RequestID:           requestID,
-		Model:               displayModel,
+		Model:               result.Model,
 		RequestedModel:      requestedModel,
-		UpstreamModel:       optionalNonEqualStringPtr(result.UpstreamModel, requestedModel),
+		UpstreamModel:       optionalNonEqualStringPtr(result.UpstreamModel, result.Model),
 		ServiceTier:         result.ServiceTier,
 		ReasoningEffort:     result.ReasoningEffort,
 		InboundEndpoint:     optionalTrimmedStringPtr(input.InboundEndpoint),
