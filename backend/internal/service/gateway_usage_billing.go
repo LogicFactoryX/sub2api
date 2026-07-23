@@ -681,6 +681,12 @@ func (s *GatewayService) recordUsageCore(ctx context.Context, input *recordUsage
 	if input.BillingModelSource == BillingModelSourceRequested && input.OriginalModel != "" {
 		billingModel = input.OriginalModel
 	}
+	// Account-level model mappings are applied after channel mapping. Once the
+	// final upstream model differs, both billing and the visible usage model
+	// follow that final target instead of an earlier alias in the chain.
+	if forwardedModel := forwardedUsageModel(result.Model, result.UpstreamModel); forwardedModel != result.Model {
+		billingModel = forwardedModel
+	}
 
 	// 确定 RequestedModel（渠道映射前的原始模型）
 	requestedModel := result.Model
@@ -901,14 +907,15 @@ func (s *GatewayService) buildRecordUsageLog(
 ) *UsageLog {
 	durationMs := int(result.Duration.Milliseconds())
 	requestID := resolveUsageBillingRequestID(ctx, result.RequestID)
+	displayModel := forwardedUsageModel(result.Model, result.UpstreamModel)
 	usageLog := &UsageLog{
 		UserID:                user.ID,
 		APIKeyID:              apiKey.ID,
 		AccountID:             account.ID,
 		RequestID:             requestID,
-		Model:                 result.Model,
+		Model:                 displayModel,
 		RequestedModel:        requestedModel,
-		UpstreamModel:         optionalNonEqualStringPtr(result.UpstreamModel, result.Model),
+		UpstreamModel:         optionalNonEqualStringPtr(result.UpstreamModel, requestedModel),
 		ReasoningEffort:       result.ReasoningEffort,
 		InboundEndpoint:       optionalTrimmedStringPtr(input.InboundEndpoint),
 		UpstreamEndpoint:      optionalTrimmedStringPtr(input.UpstreamEndpoint),

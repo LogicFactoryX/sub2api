@@ -171,8 +171,13 @@ func TestGatewayServiceRecordUsage_PreservesRequestedAndUpstreamModels(t *testin
 	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
 	svc := newGatewayRecordUsageServiceForTest(usageRepo, &openAIRecordUsageUserRepoStub{}, &openAIRecordUsageSubRepoStub{})
 	mappedModel := "claude-sonnet-4-20250514"
+	expectedCost, err := svc.billingService.CalculateCost(mappedModel, UsageTokens{
+		InputTokens:  10,
+		OutputTokens: 6,
+	}, 1.1)
+	require.NoError(t, err)
 
-	err := svc.RecordUsage(context.Background(), &RecordUsageInput{
+	err = svc.RecordUsage(context.Background(), &RecordUsageInput{
 		Result: &ForwardResult{
 			RequestID:     "gateway_models_split",
 			Usage:         ClaudeUsage{InputTokens: 10, OutputTokens: 6},
@@ -187,10 +192,11 @@ func TestGatewayServiceRecordUsage_PreservesRequestedAndUpstreamModels(t *testin
 
 	require.NoError(t, err)
 	require.NotNil(t, usageRepo.lastLog)
-	require.Equal(t, "claude-sonnet-4", usageRepo.lastLog.Model)
+	require.Equal(t, mappedModel, usageRepo.lastLog.Model)
 	require.Equal(t, "claude-sonnet-4", usageRepo.lastLog.RequestedModel)
 	require.NotNil(t, usageRepo.lastLog.UpstreamModel)
 	require.Equal(t, mappedModel, *usageRepo.lastLog.UpstreamModel)
+	require.InDelta(t, expectedCost.ActualCost, usageRepo.lastLog.ActualCost, 1e-12)
 }
 
 func TestGatewayServiceRecordUsage_EmptyImageSizeDefaultsBeforeBillingAndPersistence(t *testing.T) {
