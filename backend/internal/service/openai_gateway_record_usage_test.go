@@ -1371,6 +1371,59 @@ func TestOpenAIGatewayServiceRecordUsage_BillsMappedRequestsUsingRequestedModel(
 	require.Equal(t, expectedCost.ActualCost, userRepo.lastAmount)
 }
 
+func TestOpenAIGatewayServiceRecordUsage_AccountMappingBillsSourceModel(t *testing.T) {
+	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
+	userRepo := &openAIRecordUsageUserRepoStub{}
+	subRepo := &openAIRecordUsageSubRepoStub{}
+	svc := newOpenAIRecordUsageServiceForTest(usageRepo, userRepo, subRepo, nil)
+	usage := OpenAIUsage{InputTokens: 20, OutputTokens: 10}
+
+	requestedCost, err := svc.billingService.CalculateCost("gpt-5.1", UsageTokens{
+		InputTokens:  20,
+		OutputTokens: 10,
+	}, 1.1)
+	require.NoError(t, err)
+	forwardedCost, err := svc.billingService.CalculateCost("gpt-5.1-codex", UsageTokens{
+		InputTokens:  20,
+		OutputTokens: 10,
+	}, 1.1)
+	require.NoError(t, err)
+	require.NotEqual(t, forwardedCost.ActualCost, requestedCost.ActualCost)
+
+	err = svc.RecordUsage(context.Background(), &OpenAIRecordUsageInput{
+		Result: &OpenAIForwardResult{
+			RequestID:     "resp_account_mapping_source_billing",
+			Model:         "gpt-5.1",
+			BillingModel:  "gpt-5.1-codex",
+			UpstreamModel: "gpt-5.1-codex",
+			Usage:         usage,
+			Duration:      time.Second,
+		},
+		APIKey: &APIKey{ID: 10},
+		User:   &User{ID: 20},
+		Account: &Account{
+			ID: 30,
+			Credentials: map[string]any{
+				"model_mapping": map[string]any{"gpt-5.1": "gpt-5.1-codex"},
+			},
+		},
+		ChannelUsageFields: ChannelUsageFields{
+			OriginalModel:      "gpt-5.1",
+			ChannelMappedModel: "gpt-5.1",
+			BillingModelSource: BillingModelSourceChannelMapped,
+		},
+	})
+
+	require.NoError(t, err)
+	require.NotNil(t, usageRepo.lastLog)
+	require.Equal(t, "gpt-5.1", usageRepo.lastLog.Model)
+	require.Equal(t, "gpt-5.1", usageRepo.lastLog.RequestedModel)
+	require.NotNil(t, usageRepo.lastLog.UpstreamModel)
+	require.Equal(t, "gpt-5.1-codex", *usageRepo.lastLog.UpstreamModel)
+	require.InDelta(t, requestedCost.ActualCost, usageRepo.lastLog.ActualCost, 1e-12)
+	require.InDelta(t, requestedCost.ActualCost, userRepo.lastAmount, 1e-12)
+}
+
 func TestOpenAIGatewayServiceRecordUsage_ChannelMappedDoesNotOverrideBillingModelWhenUnmapped(t *testing.T) {
 	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
 	userRepo := &openAIRecordUsageUserRepoStub{}

@@ -165,7 +165,8 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	var cost *CostBreakdown
 	var err error
 	billingModel := forwardResultBillingModel(result.Model, result.UpstreamModel)
-	if result.BillingModel != "" {
+	accountMappedBilling := isAccountMappedOpenAIBillingResult(account, result)
+	if result.BillingModel != "" && !accountMappedBilling {
 		billingModel = strings.TrimSpace(result.BillingModel)
 	}
 	if input.BillingModelSource == BillingModelSourceChannelMapped && input.ChannelMappedModel != "" && input.ChannelMappedModel != input.OriginalModel {
@@ -174,14 +175,17 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	if input.BillingModelSource == BillingModelSourceRequested && input.OriginalModel != "" {
 		billingModel = input.OriginalModel
 	}
-	billingModels := usageBillingModelCandidates(
-		billingModel,
-		result.BillingModel,
-		input.ChannelMappedModel,
-		input.OriginalModel,
-		result.UpstreamModel,
-		result.Model,
-	)
+	billingModels := []string{billingModel}
+	if !accountMappedBilling {
+		billingModels = usageBillingModelCandidates(
+			billingModel,
+			result.BillingModel,
+			input.ChannelMappedModel,
+			input.OriginalModel,
+			result.UpstreamModel,
+			result.Model,
+		)
+	}
 	serviceTier := ""
 	if result.ServiceTier != nil {
 		serviceTier = strings.TrimSpace(*result.ServiceTier)
